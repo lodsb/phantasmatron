@@ -18,8 +18,8 @@ import eu.mihosoft.vrl.workflow.fx.FXSkinFactory;
 import javafx.scene.Parent;
 
 /**
- *
- * @author Michael
+ * Custom skin factory. 
+ * @author Michael Hoffer <info@michaelhoffer.de>
  */
 public class CustomSkinFactory extends FXSkinFactory {
 
