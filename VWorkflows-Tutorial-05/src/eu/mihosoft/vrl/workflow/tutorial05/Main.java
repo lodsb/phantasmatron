@@ -57,7 +57,7 @@ public class Main extends Application {
         // create scalable root pane
         ScalableContentPane canvas = new ScalableContentPane();
         
-        canvas.getStyleClass().setAll("slide-background");
+        canvas.getStyleClass().setAll("vflow-background");
 
         // define background style
 //        canvas.setStyle("-fx-background-color: linear-gradient(to bottom, rgb(10,32,60), rgb(42,52,120));");

@@ -18,22 +18,37 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 /**
- *
- * @author Michael
+ * Custom flownode skin. In addition to the basic node visualization from
+ * VWorkflows this skin adds custom visualization of value objects.
+ * @author Michael Hoffer <info@michaelhoffer.de>
  */
 public class CustomFlowNodeSkin extends FXFlowNodeSkin {
 
-    public CustomFlowNodeSkin(FXSkinFactory skinFactory, Parent parent, VNode model, VFlow controller) {
+    /**
+     * Constructor.
+     * @param skinFactory skin factory that created this skin
+     * @param parent FX parent node
+     * @param model node model that shall be visualized
+     * @param controller parent flow controller
+     */
+    public CustomFlowNodeSkin(FXSkinFactory skinFactory,
+            Parent parent, VNode model, VFlow controller) {
         super(skinFactory, parent, model, controller);
 
         init();
     }
 
+    /**
+     * Initializes this node skin.
+     */
     private void init() {
 
+        // update the view (uses value object of the model)
         updateView();
 
-        getModel().getValueObject().valueProperty().addListener(new ChangeListener<Object>() {
+        // registers listener to update view if new value object has been defined
+        getModel().getValueObject().valueProperty().addListener(
+                new ChangeListener<Object>() {
             @Override
             public void changed(ObservableValue<? extends Object> ov, Object t, Object t1) {
                 updateView();

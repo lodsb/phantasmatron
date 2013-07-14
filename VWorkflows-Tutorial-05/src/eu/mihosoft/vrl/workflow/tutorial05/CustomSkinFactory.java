@@ -21,17 +21,16 @@ import javafx.scene.Parent;
  *
  * @author Michael
  */
-public class CustomSkinFactory extends FXSkinFactory{
+public class CustomSkinFactory extends FXSkinFactory {
 
     public CustomSkinFactory(Parent parent) {
         super(parent);
     }
-    
-    
+
     public CustomSkinFactory(Parent parent, FXSkinFactory factory) {
-        super(parent,factory);
+        super(parent, factory);
     }
-    
+
     @Override
     public VNodeSkin createSkin(VNode n, VFlow flow) {
         return new CustomFlowNodeSkin(this, getFxParent(), n, flow);
@@ -46,6 +45,14 @@ public class CustomSkinFactory extends FXSkinFactory{
     public SkinFactory<FXConnectionSkin, FXFlowNodeSkin> createChild(Skin parent) {
 
         FXSkinFactory result = new CustomSkinFactory(((FXSkin) parent).getContentNode(), this);
+
+        return result;
+    }
+
+    @Override
+    public FXSkinFactory newInstance(Parent parent, FXSkinFactory parentFactory) {
+
+        FXSkinFactory result = new CustomSkinFactory(parent, parentFactory);
 
         return result;
     }
