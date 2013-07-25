@@ -1,0 +1,61 @@
+apply from: 'lib/gradle/javafx.plugin'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.6'
+}
+
+String javaVersion = System.getProperty("java.version")
+
+int jdk = 7;
+
+if (javaVersion.startsWith("1.7")) {
+    jdk=7;
+} else if (javaVersion.startsWith("1.8")) {
+    jdk=8;
+} else {
+    System.err.println("Unsupported JDK: " + javaVersion);
+}
+
+println(">> using jdk " + javaVersion) 
+
+dependencies {
+    compile "com.thoughtworks.xstream:xstream:1.4.4"
+    compile fileTree (dir: './lib/jfxtras/jdk'+jdk, includes: ['*.jar'])
+    compile fileTree (dir: './lib/vworkflows/jdk'+jdk, includes: ['*.jar'])
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/']
+        }
+        
+        resources {
+            srcDirs = ['src/']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['test/']
+        }
+    }
+}
+
+javafx {
+    mainClass "eu.mihosoft.vrl.workflow.tutorial05.Main"
+}
+
+jfxDeploy {
+    packaging = "image"
+}
+
+
+
