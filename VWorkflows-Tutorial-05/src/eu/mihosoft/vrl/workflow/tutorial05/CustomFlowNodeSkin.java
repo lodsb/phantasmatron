@@ -20,12 +20,16 @@ import javafx.scene.layout.StackPane;
 /**
  * Custom flownode skin. In addition to the basic node visualization from
  * VWorkflows this skin adds custom visualization of value objects.
+ *
  * @author Michael Hoffer <info@michaelhoffer.de>
  */
 public class CustomFlowNodeSkin extends FXFlowNodeSkin {
 
+    private ChangeListener<Object> valueChangeListener;
+
     /**
      * Constructor.
+     *
      * @param skinFactory skin factory that created this skin
      * @param parent FX parent node
      * @param model node model that shall be visualized
@@ -46,14 +50,15 @@ public class CustomFlowNodeSkin extends FXFlowNodeSkin {
         // update the view (uses value object of the model)
         updateView();
 
-        // registers listener to update view if new value object has been defined
-        getModel().getValueObject().valueProperty().addListener(
-                new ChangeListener<Object>() {
+        valueChangeListener = new ChangeListener<Object>() {
             @Override
             public void changed(ObservableValue<? extends Object> ov, Object t, Object t1) {
                 updateView();
             }
-        });
+        };
+
+        // registers listener to update view if new value object has been defined
+        getModel().getValueObject().valueProperty().addListener(valueChangeListener);
     }
 
     private void updateView() {
@@ -68,7 +73,19 @@ public class CustomFlowNodeSkin extends FXFlowNodeSkin {
             return;
         }
 
-        getNode().setContentPane(
-                new StackPane(new Button(getModel().getValueObject().getValue().toString())));
+        StackPane nodePane = new StackPane();
+
+        nodePane.getChildren().add(new Button(getModel().getValueObject().getValue().toString()));
+
+        getNode().setContentPane(nodePane);
+    }
+
+    @Override
+    public void remove() {
+        
+        // we remove the listener since we are going to be removed from the scene graph
+        getModel().getValueObject().valueProperty().removeListener(valueChangeListener);
+        
+        super.remove();
     }
 }

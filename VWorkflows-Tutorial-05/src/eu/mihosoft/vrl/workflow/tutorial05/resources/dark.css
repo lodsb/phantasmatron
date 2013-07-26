@@ -22,9 +22,9 @@
     -fx-background-repeat: no-repeat no-repeat;
     -fx-background-size: 32 32;
 
-    -fx-effect: dropshadow(gaussian,
+/*    -fx-effect: dropshadow(gaussian,
         rgba(0, 0, 0, 0.65),
-        20, 0.0, 10, 16);
+        20, 0.0, 10, 16);*/
 }
 
 .window-titlebar {
@@ -134,5 +134,3 @@
         rgba(0, 0, 0, 0.9),
         7, 0.0, 0, 0);*/
 }
-
-
