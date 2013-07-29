@@ -27,8 +27,9 @@ println(">> using jdk " + javaVersion)
 
 dependencies {
     compile "com.thoughtworks.xstream:xstream:1.4.4"
+    compile "eu.mihosoft.vrl.workflow:vworkflows-fx:0.1-SNAPSHOT"
     compile fileTree (dir: './lib/jfxtras/jdk'+jdk, includes: ['*.jar'])
-    compile fileTree (dir: './lib/vworkflows/jdk'+jdk, includes: ['*.jar'])
+    //compile fileTree (dir: './lib/vworkflows/jdk'+jdk, includes: ['*.jar'])
 }
 
 sourceSets {
