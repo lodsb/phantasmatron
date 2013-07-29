@@ -57,5 +57,9 @@ jfxDeploy {
     packaging = "image"
 }
 
+tasks.withType(Compile) {
+    options.encoding = 'UTF-8'
+}
+
 
 
