@@ -12,6 +12,7 @@ import eu.mihosoft.vrl.workflow.FlowFactory;
 import eu.mihosoft.vrl.workflow.VFlow;
 import eu.mihosoft.vrl.workflow.VNode;
 import eu.mihosoft.vrl.workflow.fx.FXSkinFactory;
+import eu.mihosoft.vrl.workflow.fx.FXValueSkinFactory;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import jfxtras.labs.scene.layout.ScalableContentPane;
@@ -63,7 +64,9 @@ public class Main extends Application {
 //        canvas.setStyle("-fx-background-color: linear-gradient(to bottom, rgb(10,32,60), rgb(42,52,120));");
 
         // create skin factory for flow visualization
-        FXSkinFactory fXSkinFactory = new CustomSkinFactory(canvas.getContentPane());
+        FXValueSkinFactory fXSkinFactory = new FXValueSkinFactory(canvas.getContentPane());
+        
+        fXSkinFactory.addSkinClassForValueType(Integer.class, CustomFlowNodeSkin.class);
 
         // generate the ui for the flow
         flow.addSkinFactories(fXSkinFactory);
