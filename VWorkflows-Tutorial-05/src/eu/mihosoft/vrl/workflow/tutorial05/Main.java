@@ -13,9 +13,12 @@ import eu.mihosoft.vrl.workflow.VFlow;
 import eu.mihosoft.vrl.workflow.VNode;
 import eu.mihosoft.vrl.workflow.fx.FXSkinFactory;
 import eu.mihosoft.vrl.workflow.fx.FXValueSkinFactory;
+import eu.mihosoft.vrl.workflow.fx.ScalableContentPane;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import jfxtras.labs.scene.layout.ScalableContentPane;
+
+import java.util.Random;
+import static javafx.application.Application.launch;
 
 /**
  *
@@ -49,7 +52,7 @@ public class Main extends Application {
         createFlow(flow, 3, 6);
 
         // show the main stage/window
-        showFlow(flow, primaryStage, "VWorkflows Tutorial 04: View 1");
+        showFlow(flow, primaryStage, "VWorkflows Tutorial 05: View 1");
 
     }
 
@@ -66,7 +69,7 @@ public class Main extends Application {
         // create skin factory for flow visualization
         FXValueSkinFactory fXSkinFactory = new FXValueSkinFactory(canvas.getContentPane());
         
-        fXSkinFactory.addSkinClassForValueType(Integer.class, CustomFlowNodeSkin.class);
+        fXSkinFactory.addSkinClassForValueType(Integer.class, IntegerFlowNodeSkin.class);
 
         // generate the ui for the flow
         flow.addSkinFactories(fXSkinFactory);
@@ -89,6 +92,8 @@ public class Main extends Application {
 
         // connection types
         String[] connectionTypes = {"control", "data", "event"};
+        
+        Random rand = new Random();
 
         for (int i = 0; i < width; i++) {
 
@@ -109,7 +114,8 @@ public class Main extends Application {
             // defines the node title
             n.setTitle("Node " + n.getId());
             
-            n.getValueObject().setValue(i);
+            // adding values between 0 and 100
+            n.getValueObject().setValue((int)(rand.nextDouble()*100.0));
 
             for (int k = 0; k < connectionTypes.length; k++) {
                 String type = connectionTypes[k % connectionTypes.length];
