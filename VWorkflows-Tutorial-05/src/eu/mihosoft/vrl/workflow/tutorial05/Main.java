@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 
 import java.util.Random;
 import static javafx.application.Application.launch;
+import javafx.scene.image.Image;
 
 /**
  *
@@ -53,14 +54,13 @@ public class Main extends Application {
 
         // show the main stage/window
         showFlow(flow, primaryStage, "VWorkflows Tutorial 05: View 1");
-
     }
 
     private void showFlow(VFlow flow, Stage stage, String title) {
 
         // create scalable root pane
         ScalableContentPane canvas = new ScalableContentPane();
-        
+
         canvas.getStyleClass().setAll("vflow-background");
 
         // define background style
@@ -68,17 +68,19 @@ public class Main extends Application {
 
         // create skin factory for flow visualization
         FXValueSkinFactory fXSkinFactory = new FXValueSkinFactory(canvas.getContentPane());
-        
+
         fXSkinFactory.addSkinClassForValueType(Integer.class, IntegerFlowNodeSkin.class);
+        fXSkinFactory.addSkinClassForValueType(String.class, StringFlowNodeSkin.class);
+        fXSkinFactory.addSkinClassForValueType(Image.class, ImageFlowNodeSkin.class);
 
         // generate the ui for the flow
         flow.addSkinFactories(fXSkinFactory);
 
         // the usual application setup
         Scene scene = new Scene(canvas, 1024, 600);
-        
-        scene.getStylesheets().setAll("/eu/mihosoft/vrl/workflow/tutorial05/resources/dark.css");
-        
+
+        scene.getStylesheets().setAll("/eu/mihosoft/vrl/workflow/tutorial05/resources/default.css");
+
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
@@ -92,7 +94,7 @@ public class Main extends Application {
 
         // connection types
         String[] connectionTypes = {"control", "data", "event"};
-        
+
         Random rand = new Random();
 
         for (int i = 0; i < width; i++) {
@@ -113,9 +115,17 @@ public class Main extends Application {
 
             // defines the node title
             n.setTitle("Node " + n.getId());
-            
-            // adding values between 0 and 100
-            n.getValueObject().setValue((int)(rand.nextDouble()*100.0));
+
+            if (i % 3 == 0) {
+                // adding values between 0 and 100
+                n.getValueObject().setValue((int) (rand.nextDouble() * 100.0));
+            } else if (i % 3 == 1) {
+                n.getValueObject().setValue(n.getTitle());
+            }  else if (i % 3 == 2) {
+                n.getValueObject().setValue(
+                        new Image("/eu/mihosoft/vrl/workflow/tutorial05/resources/node-img-01.png",
+                        300,300, true, true));
+            }
 
             for (int k = 0; k < connectionTypes.length; k++) {
                 String type = connectionTypes[k % connectionTypes.length];
