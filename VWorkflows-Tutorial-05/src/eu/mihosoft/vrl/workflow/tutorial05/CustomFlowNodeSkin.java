@@ -22,7 +22,7 @@ import javafx.scene.layout.GridPane;
  * visualization from VWorkflows this skin adds custom visualization of value
  * objects.
  *
- * @author Michael Hoffer <info@michaelhoffer.de>
+ * @author Michael Hoffer &lt;info@michaelhoffer.de&gt;
  */
 public abstract class CustomFlowNodeSkin extends FXFlowNodeSkinBase {
 

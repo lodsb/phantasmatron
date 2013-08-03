@@ -23,7 +23,7 @@ import javafx.scene.image.Image;
 
 /**
  *
- * @author Michael Hoffer <info@michaelhoffer.de>
+ * @author Michael Hoffer &lt;info@michaelhoffer.de&gt;
  */
 public class Main extends Application {
 
@@ -61,10 +61,8 @@ public class Main extends Application {
         // create scalable root pane
         ScalableContentPane canvas = new ScalableContentPane();
 
+        // define it as background (css class)
         canvas.getStyleClass().setAll("vflow-background");
-
-        // define background style
-//        canvas.setStyle("-fx-background-color: linear-gradient(to bottom, rgb(10,32,60), rgb(42,52,120));");
 
         // create skin factory for flow visualization
         FXValueSkinFactory fXSkinFactory = new FXValueSkinFactory(canvas.getContentPane());
@@ -79,7 +77,9 @@ public class Main extends Application {
         // the usual application setup
         Scene scene = new Scene(canvas, 1024, 600);
 
-        scene.getStylesheets().setAll("/eu/mihosoft/vrl/workflow/tutorial05/resources/default.css");
+        // add css style
+        scene.getStylesheets().setAll(
+                "/eu/mihosoft/vrl/workflow/tutorial05/resources/default.css");
 
         stage.setTitle(title);
         stage.setScene(scene);
