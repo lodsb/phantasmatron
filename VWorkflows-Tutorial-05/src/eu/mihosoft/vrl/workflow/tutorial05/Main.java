@@ -67,6 +67,7 @@ public class Main extends Application {
         // create skin factory for flow visualization
         FXValueSkinFactory fXSkinFactory = new FXValueSkinFactory(canvas.getContentPane());
 
+        // register visualizations for Integer, String and Image
         fXSkinFactory.addSkinClassForValueType(Integer.class, IntegerFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(String.class, StringFlowNodeSkin.class);
         fXSkinFactory.addSkinClassForValueType(Image.class, ImageFlowNodeSkin.class);
@@ -120,8 +121,10 @@ public class Main extends Application {
                 // adding values between 0 and 100
                 n.getValueObject().setValue((int) (rand.nextDouble() * 100.0));
             } else if (i % 3 == 1) {
+                // add the node title as value
                 n.getValueObject().setValue(n.getTitle());
             }  else if (i % 3 == 2) {
+                // add the vrl logo as value
                 n.getValueObject().setValue(
                         new Image("/eu/mihosoft/vrl/workflow/tutorial05/resources/node-img-01.png",
                         300,300, true, true));
