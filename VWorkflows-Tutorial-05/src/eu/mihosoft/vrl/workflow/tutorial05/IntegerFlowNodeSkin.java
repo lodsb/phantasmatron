@@ -12,6 +12,7 @@ import eu.mihosoft.vrl.workflow.fx.FXFlowNodeSkinBase;
 import eu.mihosoft.vrl.workflow.fx.ScalableContentPane;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import jfxtras.labs.scene.control.gauge.Gauge;
 import jfxtras.labs.scene.control.gauge.Lcd;
@@ -26,7 +27,7 @@ import jfxtras.labs.scene.control.gauge.StyleModelBuilder;
  *
  * @author Michael Hoffer <info@michaelhoffer.de>
  */
-public class IntegerFlowNodeSkin extends FXFlowNodeSkinBase {
+public class IntegerFlowNodeSkin extends CustomFlowNodeSkin {
 
     public IntegerFlowNodeSkin(FXSkinFactory skinFactory,
             VNode model, VFlow controller) {
@@ -34,26 +35,10 @@ public class IntegerFlowNodeSkin extends FXFlowNodeSkinBase {
     }
 
     @Override
-    public void updateView() {
+    protected Node createView() {
 
-        // we don't create custom view for flows
-        if (getModel() instanceof VFlowModel) {
-            return;
-        }
-
-        // we don't create a custom view if no value has been defined
-        if (getModel().getValueObject().getValue() == null) {
-            return;
-        }
-        
-        ScalableContentPane scalableContentPane = new ScalableContentPane();
-        
-        scalableContentPane.setPadding(new Insets(10));
-        
-        GridPane nodePane = new GridPane();
-        nodePane.setAlignment(Pos.CENTER);
-        scalableContentPane.setContentPane(nodePane);
-
+        // see jfxtras ensemble project for more sample code
+        // https://github.com/JFXtras/jfxtras-ensemble/tree/master/src/ensemble/samples
         StyleModel style =
                 StyleModelBuilder.create()
                 .lcdDesign(LcdDesign.GREEN_BLACK)
@@ -61,24 +46,23 @@ public class IntegerFlowNodeSkin extends FXFlowNodeSkinBase {
                 .lcdUnitStringVisible(true)
                 .lcdThresholdVisible(true)
                 .build();
-        
+
         Lcd lcd1 = LcdBuilder.create()
-                         .styleModel(style)
-                         .threshold(40)
-                         .bargraphVisible(true)
-                         .minMeasuredValueVisible(true)
-                         .minMeasuredValueDecimals(3)
-                         .maxMeasuredValueVisible(true)
-                         .maxMeasuredValueDecimals(3)
-                         .formerValueVisible(true)
-                         .title("VWorkflows")
-                         .unit("°C")
-                         .value((Integer)getModel().getValueObject().getValue())
-                         .build();
-        
+                .styleModel(style)
+                .threshold(40)
+                .bargraphVisible(true)
+                .minMeasuredValueVisible(true)
+                .minMeasuredValueDecimals(3)
+                .maxMeasuredValueVisible(true)
+                .maxMeasuredValueDecimals(3)
+                .formerValueVisible(true)
+                .title("VWorkflows")
+                .unit("°C")
+                .value((Integer) getModel().getValueObject().getValue())
+                .build();
+
         lcd1.setPrefSize(250, 70);
-        
-        scalableContentPane.getContentPane().getChildren().add(lcd1);
-        getNode().setContentPane(scalableContentPane);
+
+        return lcd1;
     }
 }

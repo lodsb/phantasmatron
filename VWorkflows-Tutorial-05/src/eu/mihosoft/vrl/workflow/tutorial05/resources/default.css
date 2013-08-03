@@ -37,7 +37,6 @@
     -fx-fill: rgba(255,255,255,50);
 }
 
-
 .vnode-connection {
     -fx-stroke: rgba(220, 220, 220, 0.75);
     -fx-stroke-width: 5px; 
