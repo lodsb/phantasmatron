@@ -1,5 +1,7 @@
 package org.lodsb.phantasmatron.core
 
+import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
+
 
 /**
  * Created by lodsb on 12/20/13.
@@ -37,6 +39,12 @@ class Code {
     ret
   }
 
+}
+
+object Code {
+  def apply(desc: ObjectDescriptor) : Code = {
+    new Code
+  }
 }
 
 /**

@@ -37,6 +37,9 @@ import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 class CodeUIController(private val code: Code, private val window: Window, private val model: VNode) {
   outer =>
 
+
+  println("UI CONTROLLER")
+
   // state monad?
   private var compileResult: Option[CompileResult] = None
   private var editor: TextArea = null
@@ -46,6 +49,8 @@ class CodeUIController(private val code: Code, private val window: Window, priva
   this.setWindowUI(code, window)
 
   private def setWindowUI(code: Code, window: Window) = {
+    println(code + " --- "+window)
+
     val scalablePane = new ScalableContentPane
     val flowPane = new FlowPane
 
@@ -57,6 +62,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
     
     window.setContentPane(scalablePane)
 
+    println("ok?")
   }
 
   val width = 400

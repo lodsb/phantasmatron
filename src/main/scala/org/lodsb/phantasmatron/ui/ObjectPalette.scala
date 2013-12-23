@@ -2,15 +2,22 @@ package org.lodsb.phantasmatron.ui
 
 import scalafx.scene.control.{TreeView, TreeItem}
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.input.{TransferMode, MouseEvent}
+import scalafx.scene.input.{ClipboardContent, TransferMode, MouseEvent}
 import javafx.event.EventHandler
 import scalafx.Includes._
+import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
+import javafx.scene.input.DataFormat
 
 /**
  * Created by lodsb on 12/22/13.
  */
-class ObjectPalette extends TreeView[String] {
+object ObjectPalette {
   case class ObjectDescriptor(name: String, location: String, categories: List[String])
+  val dataFormat = new DataFormat("ObjectDescriptor")
+
+}
+
+class ObjectPalette extends TreeView[String] {
 
   var knownObjects = List(
       ObjectDescriptor("test", "foo.scala", List("trash"))  ,
@@ -33,8 +40,15 @@ class ObjectPalette extends TreeView[String] {
 
       if(selection.size() != 0){
         val itemName = selection(0).getValue
-        if(knownObjectsMap.contains(itemName))
+        val desc = knownObjectsMap.get(itemName)
+        if(desc.isDefined) {
           println("DRAG "+ selection)
+
+          val content = new ClipboardContent
+          content.put(ObjectPalette.dataFormat, desc.get)
+
+          db.setContent(content)
+        }
       }
 
     event.consume()
