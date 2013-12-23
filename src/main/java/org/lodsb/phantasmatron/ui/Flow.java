@@ -126,14 +126,9 @@ public class Flow extends ScalableContentPane {
                     v.setWidth(300);
                     v.setHeight(200);
 
-                    //CodeFlowSkin cfs = new CodeFlowSkin(skinFactory, v, flow);
-
+                    // BUG IN VWORKFLOW?! creating nodes after init doesnt show any node's content
                     VNodeSkin skin = skinFactory.createSkin(v, flow);
                     skin.add();
-
-
-                    // BUG IN VWORKFLOW?! creating nodes after init doesnt show any node's content
-                    //flow.setSkinFactories(skinFactory);
 
                     dragEvent.setDropCompleted(true);
                 }

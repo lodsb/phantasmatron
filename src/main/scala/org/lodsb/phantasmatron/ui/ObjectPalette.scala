@@ -7,12 +7,14 @@ import javafx.event.EventHandler
 import scalafx.Includes._
 import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
 import javafx.scene.input.DataFormat
+import scala.pickling._
+import json._
 
 /**
  * Created by lodsb on 12/22/13.
  */
 object ObjectPalette {
-  case class ObjectDescriptor(name: String, location: String, categories: List[String])
+  case class ObjectDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
   val dataFormat = new DataFormat("ObjectDescriptor")
 
 }
@@ -20,11 +22,13 @@ object ObjectPalette {
 class ObjectPalette extends TreeView[String] {
 
   var knownObjects = List(
-      ObjectDescriptor("test", "foo.scala", List("trash"))  ,
-      ObjectDescriptor("test3", "foo2.scala", List("test","trash")) ,
-      ObjectDescriptor("test4", "foo2.scala", List("foobar", "trash"))  ,
-      ObjectDescriptor("test5", "foo4.scala", List("test"))
+      ObjectDescriptor("test", Some("foo.scala"),    List("trash"))  ,
+      ObjectDescriptor("test3", Some("foo2.scala"),  List("test","trash")) ,
+      ObjectDescriptor("test4", Some("foo2.scala"),  List("foobar", "trash"))  ,
+      ObjectDescriptor("test5", Some("foo4.scala"),  List("test"))
   )
+
+  knownObjects.foreach{x=>  println(x.pickle)}
 
   var knownObjectsMap = Map[String, ObjectDescriptor]()
 
@@ -56,11 +60,11 @@ class ObjectPalette extends TreeView[String] {
 
 
   private def buildTree(objectList: List[ObjectDescriptor]): TreeItem[String] = {
-    val categories = objectList.map(x => x.categories).flatten.distinct
+    val categories = objectList.map(x => x.tags).flatten.distinct
 
     val catRoots = categories.map{ cat=>
 
-      val catItems = objectList.filter(x=> x.categories.contains(cat)).map{ item =>
+      val catItems = objectList.filter(x=> x.tags.contains(cat)).map{ item =>
 
         knownObjectsMap = knownObjectsMap + (item.name -> item)
 

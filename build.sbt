@@ -22,9 +22,11 @@ libraryDependencies += "com.thoughtworks.xstream" % "xstream" % "1.4.4"
 
 libraryDependencies += "de.sciss" %% "scalainterpreterpane" % "1.6.+"
 
-libraryDependencies += "com.googlecode.scalascriptengine" % "scalascriptengine" % "1.3.6-2.10.3"
+//libraryDependencies += "com.googlecode.scalascriptengine" % "scalascriptengine" % "1.3.6-2.10.3"
 
-libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.10.3" // where i.e. ${scala.version} = 2.10.3
+//libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.10.3" // where i.e. ${scala.version} = 2.10.3
+
+libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT"
 
 unmanagedJars in Compile += Attributed.blank(file("C:/Program Files/Java/jdk1.8.0/jre/lib/ext/jfxrt.jar"))
 

@@ -1,20 +1,9 @@
 package org.lodsb.phantasmatron.core
 
-import java.io.{Writer, StringWriter, File}
-import com.googlecode.scalascriptengine._
-import com.googlecode.scalascriptengine.SourcePath
+import java.io.Writer
 
-import com.googlecode.scalascriptengine.ScalaScriptEngine
-import org.scala_tools.time.Imports._
 import de.sciss.scalainterpreter.Interpreter
 import de.sciss.scalainterpreter.Interpreter.Success
-import de.sciss.scalainterpreter.Interpreter.Error
-import scalafx.scene.layout.{GridPane, Pane}
-import scalafx.scene.text.Text
-
-
-
-
 
 
 object ScriptEngine {
