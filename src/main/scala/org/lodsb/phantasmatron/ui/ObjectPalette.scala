@@ -13,7 +13,7 @@ import json._
 /**
  * Created by lodsb on 12/22/13.
  */
-object ObjectPalette {
+object ObjectPalette { // list for locations?
   case class ObjectDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
   val dataFormat = new DataFormat("ObjectDescriptor")
 
