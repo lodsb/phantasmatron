@@ -1,4 +1,4 @@
-name := "vworkflows-tut-05"
+name := "phantasmatron"
 
 scalaVersion := "2.10.3"
 

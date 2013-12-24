@@ -1,8 +1,6 @@
 <component name="libraryTable">
   <library name="SBT: SBT: de.sciss:syntaxpane:1.1.0">
-    <CLASSES>
-      <root url="jar://$USER_HOME$/.ivy2/cache/de.sciss/syntaxpane/jars/syntaxpane-1.1.0.jar!/" />
-    </CLASSES>
+    <CLASSES />
     <JAVADOC>
       <root url="jar://$USER_HOME$/.ivy2/cache/de.sciss/syntaxpane/docs/syntaxpane-1.1.0-javadoc.jar!/" />
     </JAVADOC>
