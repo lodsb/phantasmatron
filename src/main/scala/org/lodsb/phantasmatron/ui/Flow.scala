@@ -32,7 +32,7 @@ import org.controlsfx.dialog.Dialogs
   +4>>
     >>  Made in Bavaria by fat little elves - since 1983.
  */
-class FlowS extends ScalableContentPane {
+class Flow extends ScalableContentPane {
 	val flow = FlowFactory.newFlow()
 	val skinFactory = new FXValueSkinFactory(this.getContentPane)
 
@@ -44,7 +44,6 @@ class FlowS extends ScalableContentPane {
 
 	skinFactory.addSkinClassForValueType(classOf[Code], classOf[CodeFlowSkin])
 	flow.addSkinFactories(skinFactory)
-
 
 	this.setOnDragEntered(new EventHandler[DragEvent] {
 			def handle(dragEvent: DragEvent) {

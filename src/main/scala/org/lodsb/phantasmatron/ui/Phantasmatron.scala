@@ -37,7 +37,7 @@ object Phantasmatron extends JFXApp {
     height = 800
 
 
-    val flow = new FlowS
+    val flow = new Flow
     val objectPalette = new ObjectPalette
 
     val splitPane = new SplitPane{

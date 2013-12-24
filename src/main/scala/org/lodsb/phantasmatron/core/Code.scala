@@ -2,6 +2,7 @@ package org.lodsb.phantasmatron.core
 
 import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescriptor}
 import scala.util.Try
+import java.io.File
 
 
 /**
@@ -43,7 +44,8 @@ class Code(var code: String, var descriptor: ObjectDescriptor) {
 object Code {
   def apply(desc: ObjectDescriptor) : Try[Code] = {
 	  def createCode = {
-	 		val codeString = scala.io.Source.fromFile(desc.location.get).mkString
+		  	val location = Config().codeLibrary+desc.location.get
+	 		val codeString = scala.io.Source.fromFile(location).mkString
 	 		new Code(codeString, desc)
 	 	}
 
