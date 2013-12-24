@@ -46,17 +46,13 @@ object ObjectWatcher {
 		knownObjects.clear()
 
 		fileWatcher.fileList.foreach({x =>
-			println(x)
 			val file = x.toFile
 			val fileExtension = file.getName.split('.').drop(1).lastOption
 
 			if(fileExtension.isDefined && fileExtension.get.equals("json")) {
-				println("JO")
 				val jsonString = scala.io.Source.fromFile(x.toFile).mkString
 
-				println(jsonString)
 				val desc = jsonString.unpickle[ObjectDescriptor]
-				println("ONB "+ desc)
 
 				knownObjects.add(desc)
 			}

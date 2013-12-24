@@ -79,7 +79,7 @@ class FileWatcherTask(val directory: String) extends javafx.concurrent.Task[Unit
 
 						event.kind() match {
 							case StandardWatchEventKinds.ENTRY_CREATE => fileList.add(file)
-							case StandardWatchEventKinds.ENTRY_DELETE => {println("bogus delete, fixme!"); fileList.remove(file)}
+							case StandardWatchEventKinds.ENTRY_DELETE => {println("bogus delete, fixme! (path ref object)"); fileList.remove(file)}
 							case _ =>
 						}
 

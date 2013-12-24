@@ -5,7 +5,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.input.{ClipboardContent, TransferMode, MouseEvent}
 import javafx.event.EventHandler
 import scalafx.Includes._
-import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
+import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescriptor}
 import javafx.scene.input.DataFormat
 import scala.pickling._
 import json._
@@ -19,6 +19,8 @@ import scalafx.application.Platform
  */
 object ObjectPalette { // list for locations?
   case class ObjectDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
+
+object CreateNewCodeNode extends ObjectDescriptor("New CodeNode", None, List.empty, "", "code")
   val dataFormat = new DataFormat("ObjectDescriptor")
 
 }
@@ -46,8 +48,6 @@ class ObjectPalette extends TreeView[String] {
 
       val selection = this.selectionModel.value.getSelectedItems
 
-
-
       if(selection.size() != 0){
         val itemName = selection(0).getValue
         val desc = knownObjectsMap.get(itemName)
@@ -68,7 +68,14 @@ class ObjectPalette extends TreeView[String] {
   private def buildTree(objectList: List[ObjectDescriptor]): TreeItem[String] = {
     val categories = objectList.map(x => x.tags).flatten.distinct
 
-    val catRoots = categories.map{ cat=>
+	// entry to create new node
+    var catRoots = List(new TreeItem[String]{
+				value = "Create New"
+			})
+
+	  knownObjectsMap = knownObjectsMap + ("Create New" -> CreateNewCodeNode)
+
+		catRoots = catRoots ::: categories.map{ cat=>
 
       val catItems = objectList.filter(x=> x.tags.contains(cat)).map{ item =>
 

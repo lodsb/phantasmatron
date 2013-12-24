@@ -1,14 +1,13 @@
 package org.lodsb.phantasmatron.core
 
-import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
+import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescriptor}
+import scala.util.Try
 
 
 /**
  * Created by lodsb on 12/20/13.
  */
-class Code {
-
-  var code = "new X"
+class Code(var code: String, var descriptor: ObjectDescriptor) {
 
     /*"new TT { \n" +
     "inputs = List(Input[Float](\"first\", 0.32f))\n" +
@@ -26,7 +25,7 @@ class Code {
     result match {
       case ScriptSuccess(x,y) => {
         try {
-          println("ddd "+x)
+
           val instance = x.asInstanceOf[CodeNode]
                                 ret = CompileSuccess(instance, message = y)
         } catch {
@@ -42,8 +41,17 @@ class Code {
 }
 
 object Code {
-  def apply(desc: ObjectDescriptor) : Code = {
-    new Code
+  def apply(desc: ObjectDescriptor) : Try[Code] = {
+	  def createCode = {
+	 		val codeString = scala.io.Source.fromFile(desc.location.get).mkString
+	 		new Code(codeString, desc)
+	 	}
+
+	  if(desc == CreateNewCodeNode) {
+		  Try(new Code("", desc))
+	  } else {
+		  Try(createCode)
+	  }
   }
 }
 
