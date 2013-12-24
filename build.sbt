@@ -28,6 +28,6 @@ libraryDependencies += "de.sciss" %% "scalainterpreterpane" % "1.6.+"
 
 libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT"
 
-unmanagedJars in Compile += Attributed.blank(file("C:/Program Files/Java/jdk1.8.0/jre/lib/ext/jfxrt.jar"))
+unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME")+"jre/lib/ext/jfxrt.jar"))
 
 fork := true
