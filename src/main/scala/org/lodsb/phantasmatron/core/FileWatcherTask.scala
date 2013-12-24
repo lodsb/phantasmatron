@@ -4,6 +4,10 @@ import java.nio.file._
 import java.io.File
 import scalafx.concurrent.Task
 import javax.management.remote.rmi._RMIConnection_Stub
+import java.nio.file.attribute.BasicFileAttributes
+import javafx.collections.ObservableList
+import scala.collection.mutable
+import scalafx.collections.ObservableBuffer
 
 
 /*
@@ -27,20 +31,39 @@ import javax.management.remote.rmi._RMIConnection_Stub
   +4>>
     >>  Made in Bavaria by fat little elves - since 1983.
  */
-class FileWatcherTask(val directory: String) extends Task(new javafx.concurrent.Task[Path]() {
-	val watch = FileSystems.getDefault().newWatchService();
+class FileWatcherTask(val directory: String) extends javafx.concurrent.Task[Unit]() {
 	val dir = new File(directory).toPath;
 
-	try{
-		val key = dir.register(watch, 	StandardWatchEventKinds.ENTRY_CREATE,
-										StandardWatchEventKinds.ENTRY_DELETE,
-										StandardWatchEventKinds.ENTRY_MODIFY);
+	val fileList = ObservableBuffer[Path]()
 
-	} catch {
-		case t: Throwable => t.printStackTrace()
-	}
 
-	def call(): Path = {
+	def call(): Unit = {
+
+		val watch = FileSystems.getDefault().newWatchService();
+		try{
+			val key = dir.register(watch, 	StandardWatchEventKinds.ENTRY_CREATE,
+											StandardWatchEventKinds.ENTRY_DELETE,
+											StandardWatchEventKinds.ENTRY_MODIFY);
+
+		} catch {
+			case t: Throwable => t.printStackTrace()
+		}
+
+
+		Files.walkFileTree(dir, new SimpleFileVisitor[Path]{
+			    override def visitFile(file: Path, attr: BasicFileAttributes): FileVisitResult = {
+					val msg = file.toAbsolutePath + ";ENTRY_CREATE"
+					println(msg);
+
+					updateMessage(msg)
+
+					fileList.add(file)
+
+					FileVisitResult.CONTINUE
+				}
+
+		})
+
 		while(true){
 
 			try{
@@ -54,6 +77,16 @@ class FileWatcherTask(val directory: String) extends Task(new javafx.concurrent.
 						val file = event.context().asInstanceOf[Path]
 						val child= dir.resolve(file)
 
+						event.kind() match {
+							case StandardWatchEventKinds.ENTRY_CREATE => fileList.add(file)
+							case StandardWatchEventKinds.ENTRY_DELETE => {println("bogus delete, fixme!"); fileList.remove(file)}
+							case _ =>
+						}
+
+						val msg = file.toAbsolutePath + ";" + event.kind()
+						println(msg)
+						updateMessage(msg)
+
 						// do update here
 					}
 				}
@@ -66,4 +99,4 @@ class FileWatcherTask(val directory: String) extends Task(new javafx.concurrent.
 		}
 	}
 
-})
+}

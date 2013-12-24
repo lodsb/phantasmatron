@@ -9,6 +9,10 @@ import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
 import javafx.scene.input.DataFormat
 import scala.pickling._
 import json._
+import org.lodsb.phantasmatron.core.ObjectWatcher
+import javafx.collections.ListChangeListener
+import javafx.collections.ListChangeListener.Change
+import scalafx.application.Platform
 
 /**
  * Created by lodsb on 12/22/13.
@@ -21,19 +25,21 @@ object ObjectPalette { // list for locations?
 
 class ObjectPalette extends TreeView[String] {
 
-  var knownObjects = List(
-      ObjectDescriptor("test", Some("foo.scala"),    List("trash"))  ,
-      ObjectDescriptor("test3", Some("foo2.scala"),  List("test","trash")) ,
-      ObjectDescriptor("test4", Some("foo2.scala"),  List("foobar", "trash"))  ,
-      ObjectDescriptor("test5", Some("foo4.scala"),  List("test"))
-  )
-
-  knownObjects.foreach{x=>  println(x.pickle)}
+	ObjectWatcher.foo
 
   var knownObjectsMap = Map[String, ObjectDescriptor]()
 
+  // TODO:  currently rather primitive
+  ObjectWatcher.knownObjects.addListener(new ListChangeListener[ObjectDescriptor] {
+	  def onChanged(p1: Change[_ <: ObjectDescriptor]): Unit = {
+		  println("object palette update!")
+		  val objList = ObjectWatcher.knownObjects.toList
 
-  this.root = buildTree(knownObjects)
+		  Platform.runLater({root = buildTree(objList)})
+
+	  }
+  })
+
 
   onDragDetected = (event: MouseEvent) => {
       val db = startDragAndDrop(TransferMode.MOVE)

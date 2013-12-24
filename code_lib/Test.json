@@ -1,0 +1,17 @@
+{
+   "tpe": "org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor",
+   "name": "test3",
+   "author": "lodsb",
+   "typeInfo": "code",
+   "location": {
+     "tpe": "scala.Some[java.lang.String]",
+     "x": "foo2.scala"
+   },
+   "tags": {
+     "tpe": "scala.collection.immutable.$colon$colon[java.lang.String]",
+     "elems": [
+       "test",
+       "trash"
+     ]
+   }
+}
