@@ -9,7 +9,7 @@ import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescri
 import javafx.scene.input.DataFormat
 import scala.pickling._
 import json._
-import org.lodsb.phantasmatron.core.ObjectWatcher
+import org.lodsb.phantasmatron.core.CodeObjectManager
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import scalafx.application.Platform
@@ -17,6 +17,7 @@ import scalafx.application.Platform
 /**
  * Created by lodsb on 12/22/13.
  */
+//TODO:  should be refactored
 object ObjectPalette { // list for locations?
   case class ObjectDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
 
@@ -27,15 +28,12 @@ object CreateNewCodeNode extends ObjectDescriptor("New CodeNode", None, List.emp
 
 class ObjectPalette extends TreeView[String] {
 
-	ObjectWatcher.foo
-
   var knownObjectsMap = Map[String, ObjectDescriptor]()
 
   // TODO:  currently rather primitive
-  ObjectWatcher.knownObjects.addListener(new ListChangeListener[ObjectDescriptor] {
+  CodeObjectManager.knownObjects.addListener(new ListChangeListener[ObjectDescriptor] {
 	  def onChanged(p1: Change[_ <: ObjectDescriptor]): Unit = {
-		  println("object palette update!")
-		  val objList = ObjectWatcher.knownObjects.toList
+		  val objList = CodeObjectManager.knownObjects.toList
 
 		  Platform.runLater({root = buildTree(objList)})
 

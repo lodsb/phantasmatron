@@ -3,6 +3,11 @@ package org.lodsb.phantasmatron.ui
 import jfxtras.labs.scene.control.window.Window
 import scalafx.scene.control._
 import scalafx.scene.layout._
+import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
+import scala.util.{Failure, Success}
+import org.controlsfx.dialog.Dialogs
+
+//import javafx.scene.layout.GridPane
 import eu.mihosoft.vrl.workflow._
 import de.sciss.scalainterpreter.CodePane
 import javax.swing.{JEditorPane, SwingUtilities, JPanel, JComponent}
@@ -14,11 +19,9 @@ import javafx.scene.input.ContextMenuEvent
 import org.controlsfx.control.PopOver
 import scalafx.scene.text.Text
 import scalafx.concurrent.Task
-import scala.Some
 import scalafx.scene.Node
 import javafx.application.Platform
 import scalafx.Includes._
-import scala.Some
 import javax.swing.event.{ChangeEvent, ChangeListener}
 import org.lodsb.phantasmatron.core._
 import scala.Some
@@ -28,6 +31,7 @@ import org.lodsb.reakt.{TVar, TSignal}
 import scalafx.event.Event
 import scalafx.scene.paint.Color
 import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
+
 
 
 /**
@@ -49,7 +53,6 @@ class CodeUIController(private val code: Code, private val window: Window, priva
   this.setWindowUI(code, window)
 
   private def setWindowUI(code: Code, window: Window) = {
-    println(code + " --- "+window)
 
     val scalablePane = new ScalableContentPane
     val flowPane = new FlowPane
@@ -121,30 +124,101 @@ class CodeUIController(private val code: Code, private val window: Window, priva
     }
     colorPicker.onAction = {event:Event => window.style = "-fx-background-color: "+toRgba(colorPicker.getValue,0.9)}
 
-    val textField = new TextField {
+    val nodeNameField = new TextField {
       margin = Insets(0,0,0,10)
     }
-    textField.onAction = {event: Event => window.setTitle(textField.getText)}
+    nodeNameField.onAction = {event: Event => window.setTitle(nodeNameField.getText)}
 
     val reg = new Region
     HBox.setHgrow(reg, Priority.ALWAYS)
 
     new TitledPane {
       text = "Properties"
-      val vbox = new VBox
-      val grid = new GridPane {
+      val vbox = new scalafx.scene.layout.VBox
+		val grid1 = new GridPane {
         add(new Text("color: "),0,0)
         add(colorPicker, 1,0)
         add(reg,2,0)
-        add(new Text("name: "),3,0)
-        add(textField, 4, 0)
+        add(new Text("node name: "),3,0)
+        add(nodeNameField, 4, 0)
 
         alignment = Pos.CENTER
       }
-      vbox.children.add(grid)
+
+		vbox.children.add(grid1);
+
       val sep = new Separator
       sep.margin = Insets(10,0,0,10)
       vbox.children.add(sep)
+
+		val author = new TextField {
+			margin = Insets(0,10,0,10)
+		}
+
+		val src = new TextField {
+			margin = Insets(0,10,0,10)
+		}
+
+		val tags = new TextField {
+			margin = Insets(0,10,0,10)
+		}
+
+		val saveButton = new Button("add to library") {
+			margin = Insets(0,10,0,10)
+		}
+
+		val grid2 = new GridPane {
+			add(new Text("author: "), 0, 0)
+			add(author, 1,0)
+
+			add(new Text("src location: "), 2, 0)
+			add(src, 3,0)
+
+			add(new Text("tags: "), 0, 1)
+					add(tags, 1,1)
+					add(saveButton, 3,1)
+
+
+			alignment = Pos.CENTER
+
+			margin = Insets(10)
+		}
+
+		vbox.children.add(grid2)
+
+		author.setText(code.descriptor.author)
+
+		val loc = code.descriptor.location
+
+		if(loc.isDefined) {
+			src.setText(loc.get)
+		}
+
+		val tagString = code.descriptor.tags.foldRight(""){(x,y) => x+";"+y}
+
+		tags.setText(tagString)
+
+		saveButton.onAction = (ev: Event) => {
+			val tagList: List[String] = tags.getText.split(";").toList.map{x => x.trim}
+			val currentDesc = ObjectDescriptor(nodeNameField.getText,
+											  Some(src.getText),
+												tagList,
+											  author.getText)
+			code.descriptor = currentDesc
+			code.code = editor.getText
+
+			val res = CodeObjectManager.save(code)
+
+			res match {
+				case Success(v) => println("okay")
+				case Failure(v) => {Dialogs.create().title("Error")
+									.masthead("Sorry - could not safe CodeNode")
+									.showException(v)
+				}
+			}
+		}
+
+		
       content = vbox
     }
   }

@@ -41,22 +41,6 @@ class Code(var code: String, var descriptor: ObjectDescriptor) {
 
 }
 
-object Code {
-  def apply(desc: ObjectDescriptor) : Try[Code] = {
-	  def createCode = {
-		  	val location = Config().codeLibrary+desc.location.get
-	 		val codeString = scala.io.Source.fromFile(location).mkString
-	 		new Code(codeString, desc)
-	 	}
-
-	  if(desc == CreateNewCodeNode) {
-		  Try(new Code("", desc))
-	  } else {
-		  Try(createCode)
-	  }
-  }
-}
-
 /**
  * Created by lodsb on 12/17/13.
  */

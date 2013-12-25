@@ -2,7 +2,7 @@ package org.lodsb.phantasmatron.ui
 
 import eu.mihosoft.vrl.workflow.{VNodeSkin, VNode, FlowFactory}
 import eu.mihosoft.vrl.workflow.fx.{FXValueSkinFactory, FXSkinFactory, ScalableContentPane}
-import org.lodsb.phantasmatron.core.Code
+import org.lodsb.phantasmatron.core.{CodeObjectManager, Code}
 import java.io.File
 import javafx.scene.input.{DragEvent, Dragboard, TransferMode}
 import javafx.scene.effect.BlendMode
@@ -79,7 +79,7 @@ class Flow extends ScalableContentPane {
 				if (db.getContentTypes.contains(ObjectPalette.dataFormat)) {
 					val o: ObjectPalette.ObjectDescriptor = db.getContent(ObjectPalette.dataFormat).asInstanceOf[ObjectPalette.ObjectDescriptor]
 					System.out.println("correct drop format")
-					val c: Try[Code] = Code.apply(o)
+					val c: Try[Code] = CodeObjectManager.load(o)
 
 					c match {
 						case Success(cc) => {

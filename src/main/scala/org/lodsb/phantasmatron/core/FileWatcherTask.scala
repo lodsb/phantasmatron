@@ -36,19 +36,8 @@ class FileWatcherTask(val directory: String) extends javafx.concurrent.Task[Unit
 
 	val fileList = ObservableBuffer[Path]()
 
-
-	def call(): Unit = {
-
-		val watch = FileSystems.getDefault().newWatchService();
-		try{
-			val key = dir.register(watch, 	StandardWatchEventKinds.ENTRY_CREATE,
-											StandardWatchEventKinds.ENTRY_DELETE,
-											StandardWatchEventKinds.ENTRY_MODIFY);
-
-		} catch {
-			case t: Throwable => t.printStackTrace()
-		}
-
+	def rescan = {
+		fileList.clear()
 
 		Files.walkFileTree(dir, new SimpleFileVisitor[Path]{
 			    override def visitFile(file: Path, attr: BasicFileAttributes): FileVisitResult = {
@@ -63,11 +52,27 @@ class FileWatcherTask(val directory: String) extends javafx.concurrent.Task[Unit
 				}
 
 		})
+	}
+
+	def call(): Unit = {
+
+		val watch = FileSystems.getDefault().newWatchService();
+		try{
+			val key = dir.register(watch, 	StandardWatchEventKinds.ENTRY_CREATE,
+											StandardWatchEventKinds.ENTRY_DELETE,
+											StandardWatchEventKinds.ENTRY_MODIFY);
+
+		} catch {
+			case t: Throwable => t.printStackTrace()
+		}
+
+		this.rescan
 
 		while(true){
 
 			try{
 				var key : WatchKey = watch.take()
+
 				val events = key.pollEvents().iterator()
 
 				while(events.hasNext) {
