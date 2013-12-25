@@ -1,6 +1,5 @@
 package org.lodsb.phantasmatron.core
 
-import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescriptor}
 import scala.util.Try
 import java.io.File
 
@@ -8,7 +7,7 @@ import java.io.File
 /**
  * Created by lodsb on 12/20/13.
  */
-class Code(var code: String, var descriptor: ObjectDescriptor) {
+class Code(var code: String, var descriptor: AssetDescriptor) {
 
     /*"new TT { \n" +
     "inputs = List(Input[Float](\"first\", 0.32f))\n" +

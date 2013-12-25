@@ -5,11 +5,10 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.input.{ClipboardContent, TransferMode, MouseEvent}
 import javafx.event.EventHandler
 import scalafx.Includes._
-import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescriptor}
 import javafx.scene.input.DataFormat
 import scala.pickling._
 import json._
-import org.lodsb.phantasmatron.core.CodeObjectManager
+import org.lodsb.phantasmatron.core.{CreateNewCodeNode, AssetDataFormat, AssetDescriptor, CodeAssetManager}
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import scalafx.application.Platform
@@ -17,29 +16,24 @@ import scalafx.application.Platform
 /**
  * Created by lodsb on 12/22/13.
  */
-//TODO:  should be refactored
-object ObjectPalette { // list for locations?
-  case class ObjectDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
 
-object CreateNewCodeNode extends ObjectDescriptor("New CodeNode", None, List.empty, "", "code")
-  val dataFormat = new DataFormat("ObjectDescriptor")
 
-}
+class AssetPalette extends TreeView[String] {
 
-class ObjectPalette extends TreeView[String] {
-
-  var knownObjectsMap = Map[String, ObjectDescriptor]()
+  var knownObjectsMap = Map[String, AssetDescriptor]()
 
   // TODO:  currently rather primitive
-  CodeObjectManager.knownObjects.addListener(new ListChangeListener[ObjectDescriptor] {
-	  def onChanged(p1: Change[_ <: ObjectDescriptor]): Unit = {
-		  val objList = CodeObjectManager.knownObjects.toList
+  CodeAssetManager.knownObjects.addListener(new ListChangeListener[AssetDescriptor] {
+	  def onChanged(p1: Change[_ <: AssetDescriptor]): Unit = {
+		  val objList = CodeAssetManager.knownObjects.toList
 
 		  Platform.runLater({root = buildTree(objList)})
 
 	  }
   })
 
+
+	root = buildTree(List.empty)
 
   onDragDetected = (event: MouseEvent) => {
       val db = startDragAndDrop(TransferMode.MOVE)
@@ -53,7 +47,7 @@ class ObjectPalette extends TreeView[String] {
           println("DRAG "+ selection)
 
           val content = new ClipboardContent
-          content.put(ObjectPalette.dataFormat, desc.get)
+          content.put(AssetDataFormat, desc.get)
 
           db.setContent(content)
         }
@@ -63,7 +57,7 @@ class ObjectPalette extends TreeView[String] {
   }
 
 
-  private def buildTree(objectList: List[ObjectDescriptor]): TreeItem[String] = {
+  private def buildTree(objectList: List[AssetDescriptor]): TreeItem[String] = {
     val categories = objectList.map(x => x.tags).flatten.distinct
 
 	// entry to create new node

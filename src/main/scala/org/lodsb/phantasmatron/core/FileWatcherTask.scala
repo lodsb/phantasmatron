@@ -42,7 +42,6 @@ class FileWatcherTask(val directory: String) extends javafx.concurrent.Task[Unit
 		Files.walkFileTree(dir, new SimpleFileVisitor[Path]{
 			    override def visitFile(file: Path, attr: BasicFileAttributes): FileVisitResult = {
 					val msg = file.toAbsolutePath + ";ENTRY_CREATE"
-					println(msg);
 
 					updateMessage(msg)
 

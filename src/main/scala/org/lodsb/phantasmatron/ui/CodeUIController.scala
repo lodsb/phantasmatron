@@ -3,7 +3,6 @@ package org.lodsb.phantasmatron.ui
 import jfxtras.labs.scene.control.window.Window
 import scalafx.scene.control._
 import scalafx.scene.layout._
-import org.lodsb.phantasmatron.ui.ObjectPalette.ObjectDescriptor
 import scala.util.{Failure, Success}
 import org.controlsfx.dialog.Dialogs
 
@@ -126,7 +125,10 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 
     val nodeNameField = new TextField {
       margin = Insets(0,0,0,10)
+	  text = code.descriptor.name
     }
+
+
     nodeNameField.onAction = {event: Event => window.setTitle(nodeNameField.getText)}
 
     val reg = new Region
@@ -147,9 +149,9 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 
 		vbox.children.add(grid1);
 
-      val sep = new Separator
-      sep.margin = Insets(10,0,0,10)
-      vbox.children.add(sep)
+      //val sep = new Separator
+      //sep.margin = Insets(10,0,0,10)
+      //vbox.children.add(sep)
 
 		val author = new TextField {
 			margin = Insets(0,10,0,10)
@@ -184,7 +186,12 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 			margin = Insets(10)
 		}
 
-		vbox.children.add(grid2)
+		val f = new TitledPane{
+			text = "Asset"
+			content = grid2
+			margin = Insets(10)
+		}
+		vbox.children.add(f)
 
 		author.setText(code.descriptor.author)
 
@@ -200,21 +207,21 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 
 		saveButton.onAction = (ev: Event) => {
 			val tagList: List[String] = tags.getText.split(";").toList.map{x => x.trim}
-			val currentDesc = ObjectDescriptor(nodeNameField.getText,
+			val currentDesc = AssetDescriptor(nodeNameField.getText,
 											  Some(src.getText),
 												tagList,
 											  author.getText)
 			code.descriptor = currentDesc
 			code.code = editor.getText
 
-			val res = CodeObjectManager.save(code)
+			val res = CodeAssetManager.save(code)
 
 			res match {
-				case Success(v) => println("okay")
 				case Failure(v) => {Dialogs.create().title("Error")
 									.masthead("Sorry - could not safe CodeNode")
 									.showException(v)
 				}
+				case _ =>
 			}
 		}
 
@@ -223,10 +230,12 @@ class CodeUIController(private val code: Code, private val window: Window, priva
     }
   }
 
-  private def createView(code: Code): Pane = {
+  private def createView(c: Code): Pane = {
     val control = createControlPane
     val code = createCodePane
     val prop = createPropertiesPane
+
+	window.setTitle(c.descriptor.name)
 
     this.controlsPane = Some(control)
 

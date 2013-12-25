@@ -2,7 +2,7 @@ package org.lodsb.phantasmatron.ui
 
 import eu.mihosoft.vrl.workflow.{VNodeSkin, VNode, FlowFactory}
 import eu.mihosoft.vrl.workflow.fx.{FXValueSkinFactory, FXSkinFactory, ScalableContentPane}
-import org.lodsb.phantasmatron.core.{CodeObjectManager, Code}
+import org.lodsb.phantasmatron.core.{AssetDescriptor, AssetDataFormat, CodeAssetManager, Code}
 import java.io.File
 import javafx.scene.input.{DragEvent, Dragboard, TransferMode}
 import javafx.scene.effect.BlendMode
@@ -76,10 +76,10 @@ class Flow extends ScalableContentPane {
 			def handle(dragEvent: DragEvent) {
 				System.out.println("DRAG Drop" + dragEvent.getDragboard.getContentTypes)
 				val db: Dragboard = dragEvent.getDragboard
-				if (db.getContentTypes.contains(ObjectPalette.dataFormat)) {
-					val o: ObjectPalette.ObjectDescriptor = db.getContent(ObjectPalette.dataFormat).asInstanceOf[ObjectPalette.ObjectDescriptor]
+				if (db.getContentTypes.contains(AssetDataFormat)) {
+					val o: AssetDescriptor = db.getContent(AssetDataFormat).asInstanceOf[AssetDescriptor]
 					System.out.println("correct drop format")
-					val c: Try[Code] = CodeObjectManager.load(o)
+					val c: Try[Code] = CodeAssetManager.load(o)
 
 					c match {
 						case Success(cc) => {

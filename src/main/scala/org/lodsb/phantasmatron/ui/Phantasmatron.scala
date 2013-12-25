@@ -38,7 +38,7 @@ object Phantasmatron extends JFXApp {
 
 
     val flow = new Flow
-    val objectPalette = new ObjectPalette
+    val objectPalette = new AssetPalette
 
     val splitPane = new SplitPane{
       items.add(objectPalette)

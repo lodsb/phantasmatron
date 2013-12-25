@@ -5,7 +5,6 @@ import javafx.collections.ListChangeListener
 import java.nio.file.Path
 import javafx.collections.ListChangeListener.Change
 import scalafx.collections.ObservableBuffer
-import org.lodsb.phantasmatron.ui.ObjectPalette.{CreateNewCodeNode, ObjectDescriptor}
 import scala.pickling._
 import json._
 import scala.util.Try
@@ -32,14 +31,15 @@ import java.io.File
   +4>>
     >>  Made in Bavaria by fat little elves - since 1983.
  */
-object CodeObjectManager {
+object CodeAssetManager {
 	private val fileWatcher = new FileWatcherTask(Config().codeLibrary)
 
-	val knownObjects = ObservableBuffer[ObjectDescriptor]()
+	val knownObjects = ObservableBuffer[AssetDescriptor]()
 
 	// TODO:  currently rather primitive
 	fileWatcher.fileList.addListener(new ListChangeListener[Path] {
 		def onChanged(p1: Change[_ <: Path]): Unit = {
+			println("codeasset "+p1)
 			rebuildFileList()
 		}
 	})
@@ -51,10 +51,12 @@ object CodeObjectManager {
 			val file = x.toFile
 			val fileExtension = file.getName.split('.').drop(1).lastOption
 
+			println("--- L ---"+x)
+
 			if(fileExtension.isDefined && fileExtension.get.equals("json")) {
 				val jsonString = scala.io.Source.fromFile(x.toFile).mkString
 
-				val desc = jsonString.unpickle[ObjectDescriptor]
+				val desc = jsonString.unpickle[AssetDescriptor]
 
 				knownObjects.add(desc)
 			}
@@ -62,7 +64,7 @@ object CodeObjectManager {
 		})
 	}
 
-	def load(desc: ObjectDescriptor) : Try[Code] = {
+	def load(desc: AssetDescriptor) : Try[Code] = {
 		  def createCode = {
 				val location = Config().codeLibrary+desc.location.get
 				val codeString = scala.io.Source.fromFile(location).mkString
@@ -84,9 +86,6 @@ object CodeObjectManager {
 	def save(code: Code) : Try[Unit] = {
 	    val desc = code.descriptor
 		val codeString = code.code
-
-		println("CODE "+codeString)
-		println("desc "+desc)
 
 		def s = {
 			if(desc.name == "") throw new Exception("Missing CodeNode-name")
@@ -111,17 +110,5 @@ object CodeObjectManager {
 
 	println("starting object watcher")
 	new Thread(fileWatcher).start()
-
-
-	/*fileWatcher.messageProperty.addListener(new ChangeListener[String]() {
-		override def changed(o: javafx.beans.value.ObservableValue[String], p1: String, p2: String) : Unit = {
-			println("change : "+o)
-		}
-	})*/
-
-	//def foo = {}
-
-
-
 
 }
