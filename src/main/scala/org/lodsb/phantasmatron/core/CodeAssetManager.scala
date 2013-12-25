@@ -64,9 +64,9 @@ object CodeAssetManager {
 		})
 	}
 
-	def load(desc: AssetDescriptor) : Try[Code] = {
+	def load(desc: AssetDescriptor, path: String = Config().codeLibrary) : Try[Code] = {
 		  def createCode = {
-				val location = Config().codeLibrary+desc.location.get
+				val location = path+desc.location.get
 				val codeString = scala.io.Source.fromFile(location).mkString
 				new Code(codeString, desc)
 			}
@@ -83,7 +83,7 @@ object CodeAssetManager {
 	  try { op(p) } finally { p.close() }
 	}
 
-	def save(code: Code) : Try[Unit] = {
+	def save(code: Code, path: String = Config().codeLibrary) : Try[Unit] = {
 	    val desc = code.descriptor
 		val codeString = code.code
 
@@ -92,7 +92,7 @@ object CodeAssetManager {
 			if(desc.location.get == "") throw new Exception("Missing file name")
 			if(desc.tags == List.empty) throw new Exception("Missing tags")
 
-			val loc = new File(Config().codeLibrary+desc.location.get)
+			val loc = new File(path+desc.location.get)
 			if(loc.exists()) throw new Exception("File exists")
 
 			val jsonLoc = new File(Config().codeLibrary+desc.location.get+".json")

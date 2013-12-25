@@ -2,12 +2,14 @@ package org.lodsb.phantasmatron.core
 
 import scala.util.Try
 import java.io.File
+import org.lodsb.phantasmatron.ui.CodeUIController
+import eu.mihosoft.vrl.workflow.ValueObject
 
 
 /**
  * Created by lodsb on 12/20/13.
  */
-class Code(var code: String, var descriptor: AssetDescriptor) {
+class Code(var code: String, var descriptor: AssetDescriptor) extends Asset {
 
     /*"new TT { \n" +
     "inputs = List(Input[Float](\"first\", 0.32f))\n" +

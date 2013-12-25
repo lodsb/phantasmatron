@@ -5,8 +5,10 @@ import scalafx.scene.control._
 import scalafx.scene.layout._
 import scala.util.{Failure, Success}
 import org.controlsfx.dialog.Dialogs
+import javax.management.remote.rmi._RMIConnection_Stub
 
 //import javafx.scene.layout.GridPane
+
 import eu.mihosoft.vrl.workflow._
 import de.sciss.scalainterpreter.CodePane
 import javax.swing.{JEditorPane, SwingUtilities, JPanel, JComponent}
@@ -32,468 +34,492 @@ import scalafx.scene.paint.Color
 import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 
 
-
 /**
  * Created by lodsb on 12/20/13.
  */
 
 class CodeUIController(private val code: Code, private val window: Window, private val model: VNode) {
-  outer =>
+	outer =>
+
+	println("UI CONTROLLER")
 
 
-  println("UI CONTROLLER")
 
-  // state monad?
-  private var compileResult: Option[CompileResult] = None
-  private var editor: TextArea = null
-  //private var propertiesPane: Option[TitledPane] = None
-  private var controlsPane: Option[TitledPane] = None
+	// state monad?
+	private var compileResult: Option[CompileResult] = None
+	private var editor: TextArea = null
+	//private var propertiesPane: Option[TitledPane] = None
+	private var controlsPane: Option[TitledPane] = None
 
-  this.setWindowUI(code, window)
+	private var compile = {() => println("NOT DEFINED?!?!?!?")}
 
-  private def setWindowUI(code: Code, window: Window) = {
-
-    val scalablePane = new ScalableContentPane
-    val flowPane = new FlowPane
-
-    val view = createView(code)
-
-    flowPane.children.add(view)
-
-    scalablePane.setContentPane(flowPane)
-    
-    window.setContentPane(scalablePane)
-
-    println("ok?")
-  }
-
-  val width = 400
-
-  private def createCodePane: TitledPane = {
-    val csp = createEditorPane
-    val ccp = createCodePaneControls
-
-    val codePane = new TitledPane {
-      text = "Code"
-
-      val grid = new GridPane {
-        alignment = Pos.CENTER
-
-        add(ccp, 0, 0)
-        add(csp, 0, 1)
-      }
-
-      grid.getRowConstraints.add(new RowConstraints(50))
-
-      content = grid
-
-    }
-
-    //ccp.minWidth <== codePane.width
-
-    codePane
-
-  }
-
-  private def createControlPane: TitledPane = {
-    new TitledPane {
-      text = "Control"
-    }
-  }
-
-  private def toRgba(c: Color, a: Double): String = {
-    "rgba("+(to255Int(c.red))+","+(to255Int(c.green))+","+(to255Int(c.blue))+","+a.toString+")"
-  }
-
-  private def to255Int(d: Double): Int =  {
-    (d * 255).toInt
-  }
-
-  private def gradient(c: Color) : String = {
-    " -fx-background-color : radial-gradient(center 50% 25%,\n" +
-      "        radius 75%,\n" +
-      "        "+toRgba(c,0.8)+" 0%,\n" +
-      "        rgba(82,82,82,0.9) 100%);"
-  }
+	CodeUIControllerManager.register(this)
+	this.setWindowUI(code, window)
 
 
-  private def createPropertiesPane : TitledPane = {
-    val colorPicker = new ColorPicker{
-      margin = Insets(0,50,0,10)
-    }
-    colorPicker.onAction = {event:Event => window.style = "-fx-background-color: "+toRgba(colorPicker.getValue,0.9)}
-
-    val nodeNameField = new TextField {
-      margin = Insets(0,0,0,10)
-	  text = code.descriptor.name
-    }
-
-
-    nodeNameField.onAction = {event: Event => window.setTitle(nodeNameField.getText)}
-
-    val reg = new Region
-    HBox.setHgrow(reg, Priority.ALWAYS)
-
-    new TitledPane {
-      text = "Properties"
-      val vbox = new scalafx.scene.layout.VBox
-		val grid1 = new GridPane {
-        add(new Text("color: "),0,0)
-        add(colorPicker, 1,0)
-        add(reg,2,0)
-        add(new Text("node name: "),3,0)
-        add(nodeNameField, 4, 0)
-
-        alignment = Pos.CENTER
-      }
-
-		vbox.children.add(grid1);
-
-      //val sep = new Separator
-      //sep.margin = Insets(10,0,0,10)
-      //vbox.children.add(sep)
-
-		val author = new TextField {
-			margin = Insets(0,10,0,10)
+	// crude workaround :-/
+	def uiCompile = {
+		if(model.getFlow.getNodes.toList.contains(model))  {
+			// if this node is still part of the flow
+				this.compile()
 		}
-
-		val src = new TextField {
-			margin = Insets(0,10,0,10)
-		}
-
-		val tags = new TextField {
-			margin = Insets(0,10,0,10)
-		}
-
-		val saveButton = new Button("add to library") {
-			margin = Insets(0,10,0,10)
-		}
-
-		val grid2 = new GridPane {
-			add(new Text("author: "), 0, 0)
-			add(author, 1,0)
-
-			add(new Text("src location: "), 2, 0)
-			add(src, 3,0)
-
-			add(new Text("tags: "), 0, 1)
-					add(tags, 1,1)
-					add(saveButton, 3,1)
+	}
 
 
-			alignment = Pos.CENTER
 
-			margin = Insets(10)
-		}
+	private def setWindowUI(code: Code, window: Window) = {
 
-		val f = new TitledPane{
-			text = "Asset"
-			content = grid2
-			margin = Insets(10)
-		}
-		vbox.children.add(f)
+		val scalablePane = new ScalableContentPane
+		val flowPane = new FlowPane
 
-		author.setText(code.descriptor.author)
+		val view = createView(code)
 
-		val loc = code.descriptor.location
+		flowPane.children.add(view)
 
-		if(loc.isDefined) {
-			src.setText(loc.get)
-		}
+		scalablePane.setContentPane(flowPane)
 
-		val tagString = code.descriptor.tags.foldRight(""){(x,y) => x+";"+y}
+		window.setContentPane(scalablePane)
 
-		tags.setText(tagString)
+		println("ok?")
+	}
 
-		saveButton.onAction = (ev: Event) => {
-			val tagList: List[String] = tags.getText.split(";").toList.map{x => x.trim}
-			val currentDesc = AssetDescriptor(nodeNameField.getText,
-											  Some(src.getText),
-												tagList,
-											  author.getText)
-			code.descriptor = currentDesc
-			code.code = editor.getText
+	val width = 400
 
-			val res = CodeAssetManager.save(code)
+	private def createCodePane: TitledPane = {
+		val csp = createEditorPane
+		val ccp = createCodePaneControls
 
-			res match {
-				case Failure(v) => {Dialogs.create().title("Error")
-									.masthead("Sorry - could not safe CodeNode")
-									.showException(v)
-				}
-				case _ =>
+		val codePane = new TitledPane {
+			text = "Code"
+
+			val grid = new GridPane {
+				alignment = Pos.CENTER
+
+				add(ccp, 0, 0)
+				add(csp, 0, 1)
 			}
+
+			grid.getRowConstraints.add(new RowConstraints(50))
+
+			content = grid
+
 		}
 
-		
-      content = vbox
-    }
-  }
+		//ccp.minWidth <== codePane.width
 
-  private def createView(c: Code): Pane = {
-    val control = createControlPane
-    val code = createCodePane
-    val prop = createPropertiesPane
+		codePane
 
-	window.setTitle(c.descriptor.name)
+	}
 
-    this.controlsPane = Some(control)
+	private def createControlPane: TitledPane = {
+		new TitledPane {
+			text = "Control"
+		}
+	}
 
+	private def toRgba(c: Color, a: Double): String = {
+		"rgba(" + (to255Int(c.red)) + "," + (to255Int(c.green)) + "," + (to255Int(c.blue)) + "," + a.toString + ")"
+	}
 
-    val accordion = new VBox {
-      minWidth = outer.width
+	private def to255Int(d: Double): Int = {
+		(d * 255).toInt
+	}
 
-      //TODO: properties, node name, node color
-      //panes.addAll(control, code)
-      children.add(control)
-      children.add(code)
-      children.add(prop)
-      //add(new Text("sdfsdf"),0,1)
-    }
+	private def gradient(c: Color): String = {
+		" -fx-background-color : radial-gradient(center 50% 25%,\n" +
+			"        radius 75%,\n" +
+			"        " + toRgba(c, 0.8) + " 0%,\n" +
+			"        rgba(82,82,82,0.9) 100%);"
+	}
 
-    val nodePane = new GridPane {
-      minWidth = outer.width
-    }
-    nodePane.children.add(accordion)
 
-    HBox.setHgrow(accordion, Priority.ALWAYS)
-    HBox.setHgrow(nodePane, Priority.ALWAYS)
-    HBox.setHgrow(control, Priority.ALWAYS)
-    HBox.setHgrow(code, Priority.ALWAYS)
+	private def createPropertiesPane: TitledPane = {
+		val colorPicker = new ColorPicker {
+			margin = Insets(0, 50, 0, 10)
+		}
+		colorPicker.onAction = {
+			event: Event => window.style = "-fx-background-color: " + toRgba(colorPicker.getValue, 0.9)
+		}
 
-    //HBox.setHgrow(control, Priority.ALWAYS)
+		val nodeNameField = new TextField {
+			margin = Insets(0, 0, 0, 10)
+			text = code.descriptor.name
+		}
 
-    nodePane
-  }
+
+		nodeNameField.onAction = {
+			event: Event => window.setTitle(nodeNameField.getText)
+		}
+
+		val reg = new Region
+		HBox.setHgrow(reg, Priority.ALWAYS)
 
-  private def compileAction(ed: TextArea, pi: ProgressIndicator, ae: ActionEvent): Unit = {
-    val compileString = ed.getText
+		new TitledPane {
+			text = "Properties"
+			val vbox = new scalafx.scene.layout.VBox
+			val grid1 = new GridPane {
+				add(new Text("color: "), 0, 0)
+				add(colorPicker, 1, 0)
+				add(reg, 2, 0)
+				add(new Text("node name: "), 3, 0)
+				add(nodeNameField, 4, 0)
 
-    code.code = compileString
-
-    pi.setStyle(" -fx-accent: orange;");
-    new Thread(new CompileTask(pi)).start()
-  }
-
-  private class CompileTask(pi: ProgressIndicator) extends Task(new javafx.concurrent.Task[Unit]() {
-
-    //pi.progressProperty.unbind()
-    pi.progressProperty().bind(this.progressProperty())
+				alignment = Pos.CENTER
+			}
 
-    def call(): Unit = {
-      try {
-        println("TASK")
-        updateProgress(-1, 10)
-
-
-        outer.compileResult = Some(code.compile)
-        updateProgress(10, 10)
-
-        /*
-        outer.compileResult.get match {
-          case x: CompileSuccess => pi.setStyle(" -fx-progress-color: green;");
-          case _ => pi.setStyle(" -fx-progress-color: red;");
-        } */
-
+			vbox.children.add(grid1);
 
-        println("before update")
-        Platform.runLater(new Runnable {
-          def run {
+			//val sep = new Separator
+			//sep.margin = Insets(10,0,0,10)
+			//vbox.children.add(sep)
 
-            compileResult.get match {
-              case x: CompileSuccess => pi.setStyle(" -fx-accent: green;");
-              case _ => pi.setStyle(" -fx-accent: red;");
-            }
+			val author = new TextField {
+				margin = Insets(0, 10, 0, 10)
+			}
 
-            println("running update")
-            updateModel
-          }
-        })
-      }
-      catch {
-        case e: Exception => {
-          e.printStackTrace
-        }
-      }
+			val src = new TextField {
+				margin = Insets(0, 10, 0, 10)
+			}
 
-    }
-  })
+			val tags = new TextField {
+				margin = Insets(0, 10, 0, 10)
+			}
 
-  private def connect(src: Connector, dst: Connector) = {
-    ConnectionManager.connect(src, dst)
-  }
-
-  private def disconnect(src: Connector, dst: Connector) = {
-    ConnectionManager.disconnect(src, dst)
-  }
-
-  private def updateModel = {
-
-    println("UPDATE MODEL")
-
-    try {
-
-      if (compileResult.isDefined) {
-        compileResult.get match {
-          case x: CompileError => println("Error: " + x.message)
-          case x: CompileSuccess => {
-
-            val codeNode = x.value
-            val vnode = this.model
-
-            vnode.getConnectors.clear()
-            ConnectionManager.diconnectAll(vnode)
-
-            codeNode.inputs.foreach {
-              x =>
-                val conn = vnode.addInput(x.typeString)
-                val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
-                ConnectionManager.addConnectorDescr(cdesc)
-
-                /*conn.addClickEventListener(new EventHandler[ClickEvent] {
-                  def handle(p1: ClickEvent): Unit = {
-                    if(p1.getButton == MouseButton.SECONDARY) {
-                      println("foo")
-                    }
-                  }
-                })*/
-            }
-
-            codeNode.outputs.foreach {
-              x =>
-                val conn = vnode.addOutput(x.typeString)
-                val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
-                ConnectionManager.addConnectorDescr(cdesc)
+			val saveButton = new Button("add to library") {
+				margin = Insets(0, 10, 0, 10)
+			}
 
-                /*conn.addClickEventListener(new EventHandler[ClickEvent] {
-                  def handle(p1: ClickEvent): Unit = {
-                    if(p1.getButton == MouseButton.SECONDARY) {
-                      val t = new Tooltip
-                      t.setText(("Type: "+x.typeString))
-                      t.autoHide = true
-                    }
-                  }
-                })*/
-            }
+			val grid2 = new GridPane {
+				add(new Text("author: "), 0, 0)
+				add(author, 1, 0)
 
+				add(new Text("src location: "), 2, 0)
+				add(src, 3, 0)
 
-            val connIterator = model.getConnectors.iterator()
+				add(new Text("tags: "), 0, 1)
+				add(tags, 1, 1)
+				add(saveButton, 3, 1)
 
-            while (connIterator.hasNext) {
-              val connector = connIterator.next()
-              connector.addConnectionEventListener(new EventHandler[ConnectionEvent] {
-                def handle(p1: ConnectionEvent): Unit = {
-                  p1.getEventType match {
-                    case ConnectionEvent.ADD => connect(p1.getSenderConnector, p1.getReceiverConnector)
-                    case ConnectionEvent.REMOVE => disconnect(p1.getSenderConnector, p1.getReceiverConnector)
-                  }
-                }
-              })
 
+				alignment = Pos.CENTER
 
-            }
+				margin = Insets(10)
+			}
 
-            val codeNodeControls = codeNode.controlPanel
+			val f = new TitledPane {
+				text = "Asset"
+				content = grid2
+				margin = Insets(10)
+			}
+			vbox.children.add(f)
 
-            if (this.controlsPane.isDefined) {
-              val nodeControlsPane = this.controlsPane.get
+			author.setText(code.descriptor.author)
 
-              nodeControlsPane.setContent(codeNodeControls)
-            }
+			val loc = code.descriptor.location
 
-          }
-        }
-      }
-    } catch {
-      case e: Throwable => e.printStackTrace
-    }
+			if (loc.isDefined) {
+				src.setText(loc.get)
+			}
 
-  }
+			val tagString = code.descriptor.tags.foldRight("") {
+				(x, y) => x + ";" + y
+			}
 
-  private def popUpAction(popOver: PopOver, pi: ProgressIndicator, ctx: ContextMenuEvent): Unit = {
-    if (compileResult.isDefined) {
+			tags.setText(tagString)
 
-      val message = compileResult.get match {
-        case x: CompileSuccess => x.message
-        case x: CompileError => x.message
-      }
+			saveButton.onAction = (ev: Event) => {
+				val tagList: List[String] = tags.getText.split(";").toList.map {
+					x => x.trim
+				}
+				val currentDesc = AssetDescriptor(nodeNameField.getText,
+					Some(src.getText),
+					tagList,
+					author.getText)
+				code.descriptor = currentDesc
+				code.code = editor.getText
 
-      popOver.setContentNode(new Text(message))
-      popOver.show(pi, ctx.getScreenX, ctx.getScreenY)
-    }
-  }
+				val res = CodeAssetManager.save(code)
 
+				res match {
+					case Failure(v) => {
+						Dialogs.create().title("Error")
+							.masthead("Sorry - could not safe CodeNode")
+							.showException(v)
+					}
+					case _ =>
+				}
+			}
 
-  //TODO: progress indicator should move into the window's title (so it can be seen when minimized)
-  private def createCodePaneControls: HBox = {
-    val reg = new Region()
-    val reg2 = new Region()
-    reg2.setPrefWidth(10)
-    HBox.setHgrow(reg, Priority.ALWAYS)
-    HBox.setHgrow(reg2, Priority.NEVER)
 
-    val progressIndicator = new ProgressBar() {
-      style = " -fx-accent: green;"
-      /*minHeight = 40
-      minWidth = 40 */
-      maxHeight = 25
-      maxWidth = 50
-    }
+			content = vbox
+		}
+	}
 
-    progressIndicator.setProgress(1)
+	private def createView(c: Code): Pane = {
+		val control = createControlPane
+		val code = createCodePane
+		val prop = createPropertiesPane
 
-    val popOver = new PopOver()
+		window.setTitle(c.descriptor.name)
 
-    progressIndicator onContextMenuRequested = new EventHandler[ContextMenuEvent] {
-      def handle(p1: ContextMenuEvent): Unit = popUpAction(popOver, progressIndicator, p1)
-    }
+		this.controlsPane = Some(control)
 
-    val compileButton = new Button("Compile")
-    compileButton.style = "-fx-background-color:\n        linear-gradient(#f0ff35, #a9ff00),\n        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);\n    -fx-background-radius: 6, 5;\n    -fx-background-insets: 0, 1;\n    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );\n    -fx-text-fill: #395306;"
 
-    val ta = this.editor
+		val accordion = new VBox {
+			minWidth = outer.width
 
-    compileButton onAction = new EventHandler[ActionEvent] {
-      def handle(p1: ActionEvent): Unit = compileAction(ta, progressIndicator, p1)
-    }
+			//TODO: properties, node name, node color
+			//panes.addAll(control, code)
+			children.add(control)
+			children.add(code)
+			children.add(prop)
+			//add(new Text("sdfsdf"),0,1)
+		}
 
-    val hbox = new HBox {
-      padding = Insets(20)
-      alignment = Pos.CENTER_RIGHT
+		val nodePane = new GridPane {
+			minWidth = outer.width
+		}
+		nodePane.children.add(accordion)
 
-      children.addAll(reg, compileButton, reg2, progressIndicator)
-    }
+		HBox.setHgrow(accordion, Priority.ALWAYS)
+		HBox.setHgrow(nodePane, Priority.ALWAYS)
+		HBox.setHgrow(control, Priority.ALWAYS)
+		HBox.setHgrow(code, Priority.ALWAYS)
 
-    VBox.setVgrow(hbox, Priority.NEVER)
-    HBox.setHgrow(hbox, Priority.ALWAYS)
+		//HBox.setHgrow(control, Priority.ALWAYS)
 
-    hbox
-  }
+		nodePane
+	}
 
+	private def compileAction(ed: TextArea, pi: ProgressIndicator): Unit = {
+		val compileString = ed.getText
 
-  // test for now
+		code.code = compileString
+
+		pi.setStyle(" -fx-accent: orange;");
+		new Thread(new CompileTask(pi)).start()
+	}
+
+	private class CompileTask(pi: ProgressIndicator) extends Task(new javafx.concurrent.Task[Unit]() {
+
+		//pi.progressProperty.unbind()
+		pi.progressProperty().bind(this.progressProperty())
 
-  private def createEditorPane: Node = {
-    /*val swingNode = new SwingNode
-    val cp: CodePane = Test.codePane
+		def call(): Unit = {
+			try {
+				println("TASK")
+				updateProgress(-1, 10)
+
+
+				outer.compileResult = Some(code.compile)
+				updateProgress(10, 10)
+
+				/*
+				outer.compileResult.get match {
+				  case x: CompileSuccess => pi.setStyle(" -fx-progress-color: green;");
+				  case _ => pi.setStyle(" -fx-progress-color: red;");
+				} */
+
 
-    editor = Some(cp.editor)
+				println("before update")
+				Platform.runLater(new Runnable {
+					def run {
 
-    val comp: JComponent = cp.component
-    val panel: JPanel = new JPanel(new FlowLayout)
+						compileResult.get match {
+							case x: CompileSuccess => pi.setStyle(" -fx-accent: green;");
+							case _ => pi.setStyle(" -fx-accent: red;");
+						}
 
-    System.out.println("my TEXT: " + cp.editor.getText)
+						println("running update")
+						updateModel
+					}
+				})
+			}
+			catch {
+				case e: Exception => {
+					e.printStackTrace
+				}
+			}
 
-    panel.add(cp.component)
-    comp.setPreferredSize(new Dimension(450, 450))
-    SwingUtilities.invokeLater(new Runnable {
-      def run {
-        swingNode.setContent(panel)
-      }
-    })*/
+		}
+	})
 
-    this.editor = new TextArea()
-    this.editor.setText(code.code)
-    this.editor
-  }
+	private def connect(src: Connector, dst: Connector) = {
+		ConnectionManager.connect(src, dst)
+	}
+
+	private def disconnect(src: Connector, dst: Connector) = {
+		ConnectionManager.disconnect(src, dst)
+	}
+
+	private def updateModel = {
+
+		println("UPDATE MODEL")
+
+		try {
+
+			if (compileResult.isDefined) {
+				compileResult.get match {
+					case x: CompileError => println("Error: " + x.message)
+					case x: CompileSuccess => {
+
+						val codeNode = x.value
+						val vnode = this.model
+
+						vnode.getConnectors.clear()
+						ConnectionManager.diconnectAll(vnode)
+
+						codeNode.inputs.foreach {
+							x =>
+								val conn = vnode.addInput(x.typeString)
+								val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
+								ConnectionManager.addConnectorDescr(cdesc)
+
+							/*conn.addClickEventListener(new EventHandler[ClickEvent] {
+							  def handle(p1: ClickEvent): Unit = {
+								if(p1.getButton == MouseButton.SECONDARY) {
+								  println("foo")
+								}
+							  }
+							})*/
+						}
+
+						codeNode.outputs.foreach {
+							x =>
+								val conn = vnode.addOutput(x.typeString)
+								val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
+								ConnectionManager.addConnectorDescr(cdesc)
+
+							/*conn.addClickEventListener(new EventHandler[ClickEvent] {
+							  def handle(p1: ClickEvent): Unit = {
+								if(p1.getButton == MouseButton.SECONDARY) {
+								  val t = new Tooltip
+								  t.setText(("Type: "+x.typeString))
+								  t.autoHide = true
+								}
+							  }
+							})*/
+						}
+
+
+						val connIterator = model.getConnectors.iterator()
+
+						while (connIterator.hasNext) {
+							val connector = connIterator.next()
+							connector.addConnectionEventListener(new EventHandler[ConnectionEvent] {
+								def handle(p1: ConnectionEvent): Unit = {
+									p1.getEventType match {
+										case ConnectionEvent.ADD => connect(p1.getSenderConnector, p1.getReceiverConnector)
+										case ConnectionEvent.REMOVE => disconnect(p1.getSenderConnector, p1.getReceiverConnector)
+									}
+								}
+							})
+
+
+						}
+
+						val codeNodeControls = codeNode.controlPanel
+
+						if (this.controlsPane.isDefined) {
+							val nodeControlsPane = this.controlsPane.get
+
+							nodeControlsPane.setContent(codeNodeControls)
+						}
+
+					}
+				}
+			}
+		} catch {
+			case e: Throwable => e.printStackTrace
+		}
+
+	}
+
+	private def popUpAction(popOver: PopOver, pi: ProgressIndicator, ctx: ContextMenuEvent): Unit = {
+		if (compileResult.isDefined) {
+
+			val message = compileResult.get match {
+				case x: CompileSuccess => x.message
+				case x: CompileError => x.message
+			}
+
+			popOver.setContentNode(new Text(message))
+			popOver.show(pi, ctx.getScreenX, ctx.getScreenY)
+		}
+	}
+
+	//TODO: progress indicator should move into the window's title (so it can be seen when minimized)
+	private def createCodePaneControls: HBox = {
+		val reg = new Region()
+		val reg2 = new Region()
+		reg2.setPrefWidth(10)
+		HBox.setHgrow(reg, Priority.ALWAYS)
+		HBox.setHgrow(reg2, Priority.NEVER)
+
+		val progressIndicator = new ProgressBar() {
+			style = " -fx-accent: green;"
+			/*minHeight = 40
+			  minWidth = 40 */
+			maxHeight = 25
+			maxWidth = 50
+		}
+
+		progressIndicator.setProgress(1)
+
+		val popOver = new PopOver()
+
+		progressIndicator onContextMenuRequested = new EventHandler[ContextMenuEvent] {
+			def handle(p1: ContextMenuEvent): Unit = popUpAction(popOver, progressIndicator, p1)
+		}
+
+		val compileButton = new CompileButton("Compile")
+
+		val ta = this.editor
+
+		compileButton onAction = new EventHandler[ActionEvent] {
+			def handle(p1: ActionEvent): Unit = compileAction(ta, progressIndicator)
+		}
+
+		this.compile = {() => compileAction(ta, progressIndicator)}
+
+
+		val hbox = new HBox {
+			padding = Insets(20)
+			alignment = Pos.CENTER_RIGHT
+
+			children.addAll(reg, compileButton, reg2, progressIndicator)
+		}
+
+		VBox.setVgrow(hbox, Priority.NEVER)
+		HBox.setHgrow(hbox, Priority.ALWAYS)
+
+		hbox
+	}
+
+
+	// test for now
+
+	private def createEditorPane: Node = {
+		/*val swingNode = new SwingNode
+		val cp: CodePane = Test.codePane
+
+		editor = Some(cp.editor)
+
+		val comp: JComponent = cp.component
+		val panel: JPanel = new JPanel(new FlowLayout)
+
+		System.out.println("my TEXT: " + cp.editor.getText)
+
+		panel.add(cp.component)
+		comp.setPreferredSize(new Dimension(450, 450))
+		SwingUtilities.invokeLater(new Runnable {
+		  def run {
+			swingNode.setContent(panel)
+		  }
+		})*/
+
+		this.editor = new TextArea()
+		this.editor.setText(code.code)
+		this.editor
+	}
 }

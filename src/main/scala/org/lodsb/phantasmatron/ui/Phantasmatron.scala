@@ -38,20 +38,22 @@ object Phantasmatron extends JFXApp {
 
 
     val flow = new Flow
-    val objectPalette = new AssetPalette
+    val assetPane = new AssetPane
+	val toolBar = new ToolBar(flow.flow)
 
     val splitPane = new SplitPane{
-      items.add(objectPalette)
+      items.add(assetPane)
       items.add(flow)
-      dividerPositions = 0.15
     }
 
-
     val borderpane = new BorderPane {
+		this.top = toolBar
       this.center = splitPane
     }
 
     scene = new Scene(borderpane, 1000,1000)
+
+	splitPane.dividerPositions = 0.15
 
   }
 }

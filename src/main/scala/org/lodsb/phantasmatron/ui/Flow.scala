@@ -10,6 +10,7 @@ import javafx.event.EventHandler
 import scala.util.{Failure, Success, Try}
 import org.controlsfx.control.action.Action
 import org.controlsfx.dialog.Dialogs
+import eu.mihosoft.vrl.workflow.tutorial05.StringFlowNodeSkin
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
@@ -43,7 +44,10 @@ class Flow extends ScalableContentPane {
 
 
 	skinFactory.addSkinClassForValueType(classOf[Code], classOf[CodeFlowSkin])
+	skinFactory.addSkinClassForValueType(classOf[String], classOf[StringFlowNodeSkin])
+
 	flow.addSkinFactories(skinFactory)
+
 
 	this.setOnDragEntered(new EventHandler[DragEvent] {
 			def handle(dragEvent: DragEvent) {
@@ -85,7 +89,7 @@ class Flow extends ScalableContentPane {
 						case Success(cc) => {
 							val v: VNode = flow.newNode
 							v.getValueObject.setValue(cc)
-							v.setTitle("Node " + v.getId)
+							//v.setTitle("Node " + v.getId)
 							v.setX(dragEvent.getX)
 							v.setY(dragEvent.getY)
 							v.setWidth(300)
