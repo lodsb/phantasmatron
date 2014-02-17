@@ -14,7 +14,7 @@ libraryDependencies += "eu.mihosoft.vrl.workflow-8.0" % "vworkflows-core" % "0.1
 
 libraryDependencies += "org.jfxtras" % "jfxtras-labs-8.0" % "8.0-r1-SNAPSHOT"
 
-libraryDependencies += "org.controlsfx" % "controlsfx" % "8.0.4-SNAPSHOT"
+libraryDependencies += "org.controlsfx" % "controlsfx" % "8.0.5-SNAPSHOT"
 
 libraryDependencies += "org.scalafx" % "scalafx_2.10" % "8.0.0-M1"
 
