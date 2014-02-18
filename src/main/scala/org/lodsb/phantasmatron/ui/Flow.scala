@@ -46,6 +46,10 @@ class Flow extends ScalableContentPane {
   this.setMaxScaleX(1.0);
   this.setMaxScaleY(1.0);
 
+  this.setMinScaleX(0.12);
+  this.setMinScaleY(0.12);
+
+
   this.getStyleClass.setAll("vflow-background")
 	this.getStylesheets.setAll((new File("default.css").toURI.toString))
 

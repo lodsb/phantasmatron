@@ -6,6 +6,11 @@ import scalafx.scene.layout._
 import scala.util.{Failure, Success}
 import org.controlsfx.dialog.Dialogs
 import javax.management.remote.rmi._RMIConnection_Stub
+import javafx.geometry.Bounds
+import scalafx.beans.value.ObservableValue
+import scalafx.beans.value
+import javafx.beans.value.ChangeListener
+import javafx.beans
 
 //import javafx.scene.layout.GridPane
 
@@ -23,7 +28,6 @@ import scalafx.concurrent.Task
 import scalafx.scene.Node
 import javafx.application.Platform
 import scalafx.Includes._
-import javax.swing.event.{ChangeEvent, ChangeListener}
 import org.lodsb.phantasmatron.core._
 import scala.Some
 import org.lodsb.phantasmatron.core.CompileSuccess
@@ -70,6 +74,9 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 	private def setWindowUI(code: Code, window: Window) = {
 
 		val scalablePane = new ScalableContentPane
+    scalablePane.setMaxScaleX(1.0);
+    scalablePane.setMaxScaleY(1.0);
+
 		val flowPane = new FlowPane
 
 		val view = createView(code)
@@ -79,6 +86,20 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 		scalablePane.setContentPane(flowPane)
 
 		window.setContentPane(scalablePane)
+
+    window.setBoundsListenerEnabled(true)
+    /*
+    val bl = new ChangeListener[Bounds] {
+      def changed(p1: beans.value.ObservableValue[_ <: Bounds], p2: Bounds, p3: Bounds): Unit = {
+        println("bounds ch "+ p2 + " new "+p3)
+      }
+    }
+
+    flowPane.layoutBoundsProperty().addListener( bl)
+    */
+
+    println("FL "+flowPane.getWidth + " " + flowPane.getHeight);
+    println("SP "+scalablePane.getWidth + " " + scalablePane.getHeight);
 
 		println("ok?")
 	}

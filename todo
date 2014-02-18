@@ -1,4 +1,5 @@
 * fix ui bugs -> windows
+* local zoom levels dependent on global one as well (always global 1.0 max)
 * cable coloring for types, fill for sync/async
 * tooltips for types
 * project management
