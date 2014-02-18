@@ -1,6 +1,6 @@
 package org.lodsb.phantasmatron.ui
 
-import eu.mihosoft.vrl.workflow.{VNodeSkin, VNode, FlowFactory}
+import eu.mihosoft.vrl.workflow._
 import eu.mihosoft.vrl.workflow.fx.{FXValueSkinFactory, FXSkinFactory, ScalableContentPane}
 import org.lodsb.phantasmatron.core.{AssetDescriptor, AssetDataFormat, CodeAssetManager, Code}
 import java.io.File
@@ -11,6 +11,10 @@ import scala.util.{Failure, Success, Try}
 import org.controlsfx.control.action.Action
 import org.controlsfx.dialog.Dialogs
 import eu.mihosoft.vrl.workflow.tutorial05.StringFlowNodeSkin
+import scala.util.Success
+import org.lodsb.phantasmatron.core.AssetDescriptor
+import scala.util.Failure
+import javafx.beans.property.ObjectProperty
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
@@ -35,11 +39,14 @@ import eu.mihosoft.vrl.workflow.tutorial05.StringFlowNodeSkin
  */
 class Flow extends ScalableContentPane {
 	val flow = FlowFactory.newFlow()
-	val skinFactory = new FXValueSkinFactory(this.getContentPane)
+	val skinFactory = new PValueSkinFactory(this.getContentPane)
 
 	flow.setVisible(true)
 
-	this.getStyleClass.setAll("vflow-background")
+  this.setMaxScaleX(1.0);
+  this.setMaxScaleY(1.0);
+
+  this.getStyleClass.setAll("vflow-background")
 	this.getStylesheets.setAll((new File("default.css").toURI.toString))
 
 
@@ -87,15 +94,19 @@ class Flow extends ScalableContentPane {
 
 					c match {
 						case Success(cc) => {
-							val v: VNode = flow.newNode
-							v.getValueObject.setValue(cc)
-							//v.setTitle("Node " + v.getId)
+
+              val d = new DefaultValueObject()
+              d.setValue(cc)
+              val v: VNode = flow.newNode(d)
+
 							v.setX(dragEvent.getX)
 							v.setY(dragEvent.getY)
 							v.setWidth(300)
 							v.setHeight(200)
-							val skin: VNodeSkin[_ <: VNode] = skinFactory.createSkin(v, flow)
-							skin.add
+
+							//val skin: VNodeSkin[_ <: VNode] = skinFactory.createSkin(v, flow)
+              //skin.add
+
 							dragEvent.setDropCompleted(true)
 						}
 							case Failure(v) => {

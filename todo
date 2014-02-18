@@ -1,0 +1,9 @@
+* fix ui bugs -> windows
+* cable coloring for types, fill for sync/async
+* tooltips for types
+* project management
+* icons for minimized windows, should be part of asset, so simple ops are obvious when minimized (+,/,*,-,...)
+.
+.
+.
+* project export (jar?)
