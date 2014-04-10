@@ -21,13 +21,14 @@ import scalafx.stage.{ Stage, WindowEvent }
 import scalafx.event.ActionEvent
 import scalafx.scene.chart._
 import scalafx.scene.control.TabPane.TabClosingPolicy._
-import scalafx.scene.layout.{FlowPane, BorderPane, AnchorPane, StackPane}
+import scalafx.scene.layout._
 import scalafx.scene.image.{ Image, ImageView }
 import scalafx.geometry.Pos._
 import scalafx.geometry.Orientation._
 import scalafx.geometry.Side._
 import scalafx.util.Duration._
 import scalafx.util.converter.NumberStringConverter
+import scalafx.geometry.Insets
 
 
 object Phantasmatron extends JFXApp {
@@ -46,12 +47,24 @@ object Phantasmatron extends JFXApp {
       items.add(flow)
     }
 
+    val codeShell = new CodeShell
+
     val borderpane = new BorderPane {
 		  this.top = toolBar
       this.center = splitPane
+      this.bottom = new VBox {
+        val v = new TitledPane{
+          text = "Shell"
+          content  = codeShell
+
+          expanded = false
+        }
+
+        children.add(v)
+      }
     }
 
-    scene = new Scene(borderpane, 1000,1000)
+  scene = new Scene(borderpane, 1000,1000)
 
 	splitPane.dividerPositions = 0.15
 

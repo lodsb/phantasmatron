@@ -11,7 +11,7 @@ object ScriptEngine {
   val writer = new Writer(){
     private var myString = ""
     def write(cbuf: Array[Char], off: Int, len: Int): Unit = {
-      myString = myString + new String(cbuf)
+      myString = myString + new String(cbuf.slice(off, off+len))
       println(myString)
     }
 
