@@ -76,12 +76,13 @@ public class PValueSkinFactory extends FXSkinFactory {
 
     private ConnectionSkin chooseConnectionSkin(Connection c, VFlow flow, String type) {
 
+        System.err.println("choose connection skin"+c);
         String connectionType = c.getType();
 
         Class<? extends FXConnectionSkin> skinClass = connectionSkins.get(connectionType);
 
         if (skinClass==null) {
-            skinClass = FXConnectionSkin.class;
+            skinClass = PConnectionSkin.class;
         }
 
         try {
@@ -91,8 +92,8 @@ public class PValueSkinFactory extends FXSkinFactory {
                     FXSkinFactory.class, Parent.class,
                     Connection.class, VFlow.class, String.class);
 
-            FXConnectionSkin skin
-                    = (FXConnectionSkin) constructor.newInstance(this, getFxParent(), c, flow, type);
+            PConnectionSkin skin
+                    = (PConnectionSkin) constructor.newInstance(this, getFxParent(), c, flow, type);
 
             return skin;
 
@@ -101,7 +102,7 @@ public class PValueSkinFactory extends FXSkinFactory {
                     Level.SEVERE, null, ex);
         }
 
-        return new FXConnectionSkin(this, getFxParent(), c, flow, type/*, clipboard*/);
+        return new PConnectionSkin(this, getFxParent(), c, flow, type/*, clipboard*/);
     }
 
     public void addSkinClassForValueType(Class<?> valueType,

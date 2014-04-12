@@ -38,7 +38,7 @@
 }
 
 .vnode-connection {
-    -fx-stroke: rgba(220, 220, 220, 0.75);
+    -fx-stroke: rgba(255, 0, 0, 0.75);
     -fx-stroke-width: 5px; 
     /*-fx-stroke-line-cap: round;*/
 
