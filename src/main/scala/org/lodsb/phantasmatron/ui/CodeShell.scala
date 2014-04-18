@@ -26,6 +26,7 @@ class CodeShell extends VBox {
       e.getCode match {
         case KeyCode.ENTER => {
           val code = shellInputField.text.value
+          shellOutput.appendText("> "+code+"\n")
 
           commandHistory = commandHistory :+ code
           commandHistoryIndex = commandHistory.size-1
