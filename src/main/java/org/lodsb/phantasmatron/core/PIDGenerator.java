@@ -1,5 +1,17 @@
+package org.lodsb.phantasmatron.core;
+
+import eu.mihosoft.vrl.workflow.IdGenerator;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Created by lodsb on 4/17/14.
+ */
 /*
- * Copyright 2012 Michael Hoffer <info@michaelhoffer.de>. All rights reserved.
+ * IdGeneratorImpl.java
+ *
+ * Copyright 2012-2013 Michael Hoffer <info@michaelhoffer.de>. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -10,6 +22,12 @@
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
+ *
+ * Please cite the following publication(s):
+ *
+ * M. Hoffer, C.Poliwoda, G.Wittum. Visual Reflection Library -
+ * A Framework for Declarative GUI Programming on the Java Platform.
+ * Computing and Visualization in Science, 2011, in press.
  *
  * THIS SOFTWARE IS PROVIDED BY Michael Hoffer <info@michaelhoffer.de> "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
@@ -25,31 +43,60 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Michael Hoffer <info@michaelhoffer.de>.
  */
-package eu.mihosoft.vrl.workflow.tutorial05;
-
-import eu.mihosoft.vrl.workflow.VFlow;
-import eu.mihosoft.vrl.workflow.VNode;
-import eu.mihosoft.vrl.workflow.fx.FXSkinFactory;
-import javafx.scene.Node;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 /**
- * Custom flownode skin. In addition to the basic node visualization from
- * VWorkflows this skin adds custom visualization of value objects.
  *
- * @author Michael Hoffer &lt;info@michaelhoffer.de&gt;
+ * @author Michael Hoffer  &lt;info@michaelhoffer.de&gt;
  */
-public class ImageFlowNodeSkin extends CustomFlowNodeSkin {
+class PIDGenerator implements IdGenerator {
 
-    public ImageFlowNodeSkin(FXSkinFactory skinFactory,
-            VNode model, VFlow controller) {
-        super(skinFactory, model, controller);
+    private Set<String> ids = new HashSet<>();
+    private int lastId = 0;
+
+    public PIDGenerator() {
+        //
     }
-    
+
     @Override
-    public Node createView() {
-         return new ImageView(
-                new Image("/node-img-01.png"));
+    public void addId(String id) {
+        ids.add(id);
     }
+
+    @Override
+    public void addIds(IdGenerator generator) {
+        ids.addAll(generator.getIds());
+    }
+
+    @Override
+    public String newId() {
+
+        // TODO improve id generation
+        // Question: do we really want strings as id?
+        int counter = lastId+1;
+
+        String id = "" + counter; // verified that java / & 8 uses stringbuilder
+
+        while(ids.contains(id)) {
+            counter++;
+            id = "" + counter;
+        }
+
+        ids.add(id);
+
+        lastId = counter;
+
+        return id;
+    }
+
+    @Override
+    public Set<String> getIds() {
+        Set<String> result = new HashSet<>(ids);
+        return result;
+    }
+
+    @Override
+    public IdGenerator newChild() {
+        return this;
+    }
+
 }
