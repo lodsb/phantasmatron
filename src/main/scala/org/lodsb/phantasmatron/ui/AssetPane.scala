@@ -1,7 +1,6 @@
 package org.lodsb.phantasmatron.ui
 
 import scalafx.scene.layout.{HBox, Priority, VBox, GridPane}
-import org.controlsfx.control.TextFields
 import scalafx.Includes._
 import scalafx.scene.text.Text
 import scalafx.geometry.{Pos, Insets}
@@ -9,6 +8,7 @@ import org.controlsfx.glyphfont.{FontAwesome, GlyphFontRegistry}
 import scalafx.scene.control.Label
 import scalafx.scene.paint.Color
 import scalafx.event.Event
+import org.controlsfx.control.textfield.TextFields
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.

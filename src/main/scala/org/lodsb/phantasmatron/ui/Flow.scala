@@ -2,7 +2,7 @@ package org.lodsb.phantasmatron.ui
 
 import eu.mihosoft.vrl.workflow._
 import eu.mihosoft.vrl.workflow.fx.{FXValueSkinFactory, FXSkinFactory, ScalableContentPane}
-import org.lodsb.phantasmatron.core.{AssetDescriptor, AssetDataFormat, CodeAssetManager, Code}
+import org.lodsb.phantasmatron.core._
 import java.io.File
 import javafx.scene.input.{DragEvent, Dragboard, TransferMode}
 import javafx.scene.effect.BlendMode
@@ -10,11 +10,12 @@ import javafx.event.EventHandler
 import scala.util.{Failure, Success, Try}
 import org.controlsfx.control.action.Action
 import org.controlsfx.dialog.Dialogs
-import eu.mihosoft.vrl.workflow.tutorial05.StringFlowNodeSkin
+import scala.util.Success
+import scala.util.Failure
+import javafx.beans.property.ObjectProperty
 import scala.util.Success
 import org.lodsb.phantasmatron.core.AssetDescriptor
 import scala.util.Failure
-import javafx.beans.property.ObjectProperty
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
@@ -38,7 +39,7 @@ import javafx.beans.property.ObjectProperty
     >>  Made in Bavaria by fat little elves - since 1983.
  */
 class Flow extends ScalableContentPane {
-	val flow = FlowFactory.newFlow()
+	val flow = PFlowFactory.newFlow()
 	val skinFactory = new PValueSkinFactory(this.getContentPane)
 
 	flow.setVisible(true)
@@ -51,7 +52,7 @@ class Flow extends ScalableContentPane {
 
 
 	skinFactory.addSkinClassForValueType(classOf[Code], classOf[CodeFlowSkin])
-	skinFactory.addSkinClassForValueType(classOf[String], classOf[StringFlowNodeSkin])
+//	skinFactory.addSkinClassForValueType(classOf[String], classOf[StringFlowNodeSkin])
 
 	flow.addSkinFactories(skinFactory)
 
@@ -95,9 +96,9 @@ class Flow extends ScalableContentPane {
 					c match {
 						case Success(cc) => {
 
-              val d = new DefaultValueObject()
-              d.setValue(cc)
-              val v: VNode = flow.newNode(d)
+              val pv = new PValueObject()
+              pv.setValue(cc)
+              val v: VNode = flow.newNode(pv)
 
 							v.setX(dragEvent.getX)
 							v.setY(dragEvent.getY)

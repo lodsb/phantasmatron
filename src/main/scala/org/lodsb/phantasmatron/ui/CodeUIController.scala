@@ -6,6 +6,8 @@ import scalafx.scene.layout._
 import scala.util.{Failure, Success}
 import org.controlsfx.dialog.Dialogs
 import javax.management.remote.rmi._RMIConnection_Stub
+import org.lodsb.reakt.TVar
+import org.lodsb.phantasmatron.core.PConnector
 
 //import javafx.scene.layout.GridPane
 
@@ -26,8 +28,7 @@ import scalafx.Includes._
 import javax.swing.event.{ChangeEvent, ChangeListener}
 import org.lodsb.phantasmatron.core._
 import scala.Some
-import org.lodsb.phantasmatron.core.CompileSuccess
-import org.lodsb.phantasmatron.core.CompileError
+import org.lodsb.phantasmatron.core.{PConnector, CompileSuccess, CompileError}
 import org.lodsb.reakt.{TVar, TSignal}
 import scalafx.event.Event
 import scalafx.scene.paint.Color
@@ -268,8 +269,6 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 		val accordion = new VBox {
 			minWidth = outer.width
 
-			//TODO: properties, node name, node color
-			//panes.addAll(control, code)
 			children.add(control)
 			children.add(code)
 			children.add(prop)
@@ -345,6 +344,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 	})
 
 	private def connect(src: Connector, dst: Connector) = {
+    println("CONNECT!")
 		ConnectionManager.connect(src, dst)
 	}
 
@@ -364,16 +364,19 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 					case x: CompileSuccess => {
 
 						val codeNode = x.value
-						val vnode = this.model
+						val vnode = this.model.asInstanceOf[PNode]
 
 						vnode.getConnectors.clear()
 						ConnectionManager.diconnectAll(vnode)
 
 						codeNode.inputs.foreach {
 							x =>
-								val conn = vnode.addInput(x.typeString)
-								val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
-								ConnectionManager.addConnectorDescr(cdesc)
+
+								val conn = new PConnector(vnode, x.typeTag, null, true);
+                val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
+                ConnectionManager.addConnectorDescr(cdesc)
+
+                vnode.addInputConnector(conn);
 
 							/*conn.addClickEventListener(new EventHandler[ClickEvent] {
 							  def handle(p1: ClickEvent): Unit = {
@@ -386,9 +389,11 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 
 						codeNode.outputs.foreach {
 							x =>
-								val conn = vnode.addOutput(x.typeString)
+                val conn = new PConnector(vnode, x.typeTag, null, false);
 								val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
-								ConnectionManager.addConnectorDescr(cdesc)
+                ConnectionManager.addConnectorDescr(cdesc)
+
+                vnode.addOutputConnector(conn)
 
 							/*conn.addClickEventListener(new EventHandler[ClickEvent] {
 							  def handle(p1: ClickEvent): Unit = {
@@ -402,12 +407,14 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 						}
 
 
-						val connIterator = model.getConnectors.iterator()
+						val connIterator = vnode.getConnectors.iterator()
+            println(vnode.getConnectors)
 
 						while (connIterator.hasNext) {
 							val connector = connIterator.next()
 							connector.addConnectionEventListener(new EventHandler[ConnectionEvent] {
 								def handle(p1: ConnectionEvent): Unit = {
+                  println(p1+ " - conn event "+p1.getEventType + " " + ConnectionEvent.ADD + ConnectionEvent.REMOVE );
 									p1.getEventType match {
 										case ConnectionEvent.ADD => connect(p1.getSenderConnector, p1.getReceiverConnector)
 										case ConnectionEvent.REMOVE => disconnect(p1.getSenderConnector, p1.getReceiverConnector)

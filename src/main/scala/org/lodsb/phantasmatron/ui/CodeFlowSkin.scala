@@ -8,7 +8,7 @@ import javax.swing.{SwingUtilities, JPanel, JComponent}
 import java.awt.{Dimension, FlowLayout}
 import scalafx.scene.layout.{Pane, HBox, GridPane}
 import jfxtras.labs.scene.control.window.Window
-import org.lodsb.phantasmatron.core.Code
+import org.lodsb.phantasmatron.core.{ConnectionManager, Code}
 import scalafx.Includes._
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
@@ -40,11 +40,30 @@ class CodeFlowSkin(skinFactory: FXSkinFactory, model: VNode, controller: VFlow)
           p1.getAddedSubList.toArray.foreach({ x =>
 
             val conn = x.asInstanceOf[Connector]
+            val desc = ConnectionManager.getDescriptor(conn)
+            val typeColor = Util.typeString2Color(conn.getType)
+
             val node = getConnectorNodeByReference(conn).asInstanceOf[Shape]
             node.getStyleClass.clear()
-            node.setFill(Util.typeString2Color(conn.getType))
+            node.setFill(typeColor)
 
-            val t = new Tooltip(conn.getType)
+            var signalInfo =""
+            var signalName =""
+
+            if (desc.isDefined) {
+              val kind = desc.get
+              signalName = kind.signal.name+": "
+
+              if(kind.signal.isAsync) {
+                node.setStroke(Color.WHITE)
+                node.setStrokeWidth(2)
+                node.getStrokeDashArray.addAll(3d)
+                signalInfo = ", async"
+              }
+            }
+
+
+            val t = new Tooltip(signalName + conn.getType+signalInfo)
             Tooltip.install(node, t)
 
           })

@@ -10,9 +10,9 @@ object Util {
   def typeString2Color(s: String) : Color = {
     val hash = hashString(s);
 
-    val doubleBytes = ByteBuffer.allocate(4).putInt(hash).array().map( x => (x.toDouble).abs / 255.0)
+    val doubleBytes = ByteBuffer.allocate(4).putInt(hash).array().map( x => (x.abs % 16)*16)
 
-    new Color(doubleBytes(0),doubleBytes(1),doubleBytes(2),1.0);
+    Color.rgb(doubleBytes(0),doubleBytes(1),doubleBytes(2));
   }
 
   private def hashString(s: String) : Int = {

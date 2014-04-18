@@ -29,6 +29,7 @@ class Code(var code: String, var descriptor: AssetDescriptor) extends Asset {
         try {
 
           val instance = x.asInstanceOf[CodeNode]
+
                                 ret = CompileSuccess(instance, message = y)
         } catch {
           case t: Throwable =>  ret = CompileError(y + "\n" + t.getMessage)

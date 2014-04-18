@@ -11,6 +11,7 @@ import scalafx.beans.value.ObservableValue
 import javafx.beans.value
 import scalafx.beans.property.StringProperty
 import scalafx.application.Platform
+import org.lodsb.reakt.graph.NodeBase
 
 
 /**
@@ -37,11 +38,14 @@ class TT extends CodeNode
 class X extends TT {
   import scalafx.scene.control.Slider
 
-  val in = Input[Double]("foo", 0.0)
+  val in = Input[Double]("foo", 0.0, false)
   val out= Output[Double]("slider", 0.0)
+  val out2: TaggedSignal[String, _ <: TVar[String]] =Output[String]("sf", "")
 
   inputs = List(in)
-  outputs= List(out)
+  outputs = outputs :+ out
+  outputs = outputs :+ out2
+  outputs = outputs :+ Output[Boolean]("farrrr", true)
 
   in.observe({x=> println("connected value: "+x); true})
 
@@ -85,12 +89,20 @@ trait TaggedSignal[T, S <: TVar[T]] {
 
   val signal: S = this
 
+  protected val async = false;
+  protected val signalName = "";
+
+  def isAsync = async
+  def name = signalName
+
   var outerTypeTag : TypeTag[S]
   var innerTypeTag : TypeTag[T]
 
   def typeString : String = {
     innerTypeTag.toString()
   }
+
+  def typeTag = innerTypeTag
 }
 
 /*
@@ -101,9 +113,12 @@ class TaggedValA[T](val name: String, default: T)(implicit ev: TypeTag[TaggedVal
 }
 */
 
-class TaggedVarA[T](val name: String, default: T)(implicit ev: TypeTag[TaggedVarA[T]], ev2: TypeTag[T]) extends VarA(default) with TaggedSignal[T, TaggedVarA[T]]{
+class TaggedVarA[T](val varName: String, default: T)(implicit ev: TypeTag[TaggedVarA[T]], ev2: TypeTag[T]) extends VarA(default) with TaggedSignal[T, TaggedVarA[T]]{
   var outerTypeTag = ev
   var innerTypeTag = ev2
+
+  override val async = true
+  override val signalName = varName
 }
 
 /*
@@ -113,7 +128,10 @@ class TaggedValS[T](val name: String, default: T)(implicit ev: TypeTag[TaggedVal
 }
 */
 
-class TaggedVarS[T](val name: String, default: T)(implicit ev: TypeTag[TaggedVarS[T]], ev2: TypeTag[T]) extends VarS(default) with TaggedSignal[T, TaggedVarS[T]]{
+class TaggedVarS[T](val varName: String, default: T)(implicit ev: TypeTag[TaggedVarS[T]], ev2: TypeTag[T]) extends VarS(default) with TaggedSignal[T, TaggedVarS[T]]{
   var outerTypeTag = ev
   var innerTypeTag = ev2
+
+  override val async = false
+  override val signalName = varName
 }

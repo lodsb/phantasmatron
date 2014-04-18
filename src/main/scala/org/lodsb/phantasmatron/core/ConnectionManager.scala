@@ -52,7 +52,8 @@ object ConnectionManager {
         val srcDesc = srcDescL.get
         val dstDesc = dstDescL.get
 
-        if(srcDesc.signal.outerTypeTag.tpe.<:<(dstDesc.signal.outerTypeTag.tpe)) {
+        //if(srcDesc.signal.outerTypeTag.tpe.<:<(dstDesc.signal.outerTypeTag.tpe)) {
+
           val l = connectionMap.get(srcDesc.node)
           var list = l.getOrElse(List[(ConnectorDescriptor[_], ConnectorDescriptor[_])]())
 
@@ -62,7 +63,7 @@ object ConnectionManager {
 
           connectionMap = connectionMap + (srcDesc.node -> list)
 
-        }
+        //}
 
 
 
@@ -71,6 +72,10 @@ object ConnectionManager {
       }
 
     }
+  }
+
+  def getDescriptor(connector: Connector) : Option[ConnectorDescriptor[_]]= {
+    connectorMap.get(connector)
   }
 
   def disconnect(src: Connector, dst: Connector) = {
