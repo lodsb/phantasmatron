@@ -17,7 +17,7 @@ import org.lodsb.reakt.graph.NodeBase
 /**
  * Created by lodsb on 12/20/13.
  */
-trait CodeNode {
+trait CodeObject {
   var inputs : Seq[TaggedSignal[_,_ <: TVar[_]]] = List.empty
   var outputs: Seq[TaggedSignal[_,_ <: TVar[_]]] = List.empty
 
@@ -33,7 +33,7 @@ trait CodeNode {
 /**
  * Created by lodsb on 12/20/13.
  */
-class TT extends CodeNode
+class TT extends CodeObject
 
 class X extends TT {
   import scalafx.scene.control.Slider

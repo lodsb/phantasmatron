@@ -9,15 +9,18 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.StyleSpansBuilder;
+import org.fxmisc.richtext.{StyleClassedTextArea, CodeArea, StyleSpansBuilder}
+;
+
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
+import javafx.stage.Stage
+import java.io.File
+;
 
 
 object ScalaEditor {
@@ -39,7 +42,11 @@ object ScalaEditor {
 
   def apply() = {
     val  codeArea = new CodeArea();
-    /*codeArea.textProperty().addListener(new ChangeListener[String]() {
+
+    codeArea.setWrapText(true)
+    codeArea.requestFocus()
+
+    codeArea.textProperty().addListener(new ChangeListener[String]() {
 
       /*public void changed(ObservableValue<? extends String> observable,
       String oldText, String newText) {
@@ -65,15 +72,14 @@ object ScalaEditor {
           println(matcher.toString)
           spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd)
           spansBuilder.add(Collections.singleton("keyword"), matcher.end() - matcher.start());
+          //codeArea.setStyleClass(matcher.start(), matcher.end(), "keyword")
           lastKwEnd = matcher.end();
         }
-        println(spansBuilder)
-
         spansBuilder.add(Collections.emptyList(), newText.length() - lastKwEnd);
-       // codeArea.setStyleSpans(0, spansBuilder.create());
+        codeArea.setStyleSpans(0, spansBuilder.create());
       }
 
-    });*/
+    });
     codeArea
   }
 

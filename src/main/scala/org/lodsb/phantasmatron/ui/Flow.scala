@@ -48,7 +48,7 @@ class Flow extends ScalableContentPane {
   this.setMaxScaleY(1.0);
 
   this.getStyleClass.setAll("vflow-background")
-	this.getStylesheets.setAll((new File("default.css").toURI.toString))
+//	this.getStylesheets.setAll((new File("default.css").toURI.toString))
 
 
 	skinFactory.addSkinClassForValueType(classOf[Code], classOf[CodeFlowSkin])

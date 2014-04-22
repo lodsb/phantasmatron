@@ -28,7 +28,7 @@ class Code(var code: String, var descriptor: AssetDescriptor) extends Asset {
       case ScriptSuccess(x,y) => {
         try {
 
-          val instance = x.asInstanceOf[CodeNode]
+          val instance = x.asInstanceOf[CodeObject]
 
                                 ret = CompileSuccess(instance, message = y)
         } catch {
@@ -49,6 +49,6 @@ class Code(var code: String, var descriptor: AssetDescriptor) extends Asset {
 
 abstract class CompileResult(val message: String)
 
-case class CompileSuccess(value: CodeNode, override val message: String) extends CompileResult(message)
+case class CompileSuccess(value: CodeObject, override val message: String) extends CompileResult(message)
 
 case class CompileError(override val message:String) extends CompileResult(message)

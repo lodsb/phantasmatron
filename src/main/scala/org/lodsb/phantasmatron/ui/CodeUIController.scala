@@ -7,7 +7,14 @@ import scala.util.{Failure, Success}
 import org.controlsfx.dialog.Dialogs
 import javax.management.remote.rmi._RMIConnection_Stub
 import org.lodsb.reakt.TVar
-import org.lodsb.phantasmatron.core.PConnector
+import org.lodsb.phantasmatron.core._
+import scala.util.Failure
+import scala.Some
+import org.lodsb.phantasmatron.core.ConnectorDescriptor
+import org.lodsb.phantasmatron.core.CompileSuccess
+import org.lodsb.phantasmatron.core.CompileError
+import org.lodsb.phantasmatron.core.AssetDescriptor
+import org.lodsb.phantasmatron.core.dataflow.CodeNodeModel
 
 //import javafx.scene.layout.GridPane
 
@@ -26,9 +33,7 @@ import scalafx.scene.Node
 import javafx.application.Platform
 import scalafx.Includes._
 import javax.swing.event.{ChangeEvent, ChangeListener}
-import org.lodsb.phantasmatron.core._
 import scala.Some
-import org.lodsb.phantasmatron.core.{PConnector, CompileSuccess, CompileError}
 import org.lodsb.reakt.{TVar, TSignal}
 import scalafx.event.Event
 import scalafx.scene.paint.Color
@@ -39,7 +44,7 @@ import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
  * Created by lodsb on 12/20/13.
  */
 
-class CodeUIController(private val code: Code, private val window: Window, private val model: VNode) {
+class CodeUIController(private val code: CodeNodeModel, private val window: Window, private val model: VNode) {
 	outer =>
 
 	println("UI CONTROLLER")
@@ -68,7 +73,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 
 
 
-	private def setWindowUI(code: Code, window: Window) = {
+	private def setWindowUI(code: CodeNodeModel, window: Window) = {
 
 		val scalablePane = new ScalableContentPane
 		val flowPane = new FlowPane
@@ -144,7 +149,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 
 		val nodeNameField = new TextField {
 			margin = Insets(0, 0, 0, 10)
-			text = code.descriptor.name
+			text = code.getDescriptor.name
 		}
 
 
@@ -214,15 +219,15 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 			}
 			vbox.children.add(f)
 
-			author.setText(code.descriptor.author)
+			author.setText(code.getDescriptor.author)
 
-			val loc = code.descriptor.location
+			val loc = code.getDescriptor.location
 
 			if (loc.isDefined) {
 				src.setText(loc.get)
 			}
 
-			val tagString = code.descriptor.tags.foldRight("") {
+			val tagString = code.getDescriptor.tags.foldRight("") {
 				(x, y) => x + ";" + y
 			}
 
@@ -236,10 +241,10 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 					Some(src.getText),
 					tagList,
 					author.getText)
-				code.descriptor = currentDesc
-				code.code = editor.getText
+        code.setDescriptor(currentDesc)
+        code.setCodeString(editor.getText)
 
-				val res = CodeAssetManager.save(code)
+				val res = CodeAssetManager.save(code.getCode)
 
 				res match {
 					case Failure(v) => {
@@ -256,12 +261,12 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 		}
 	}
 
-	private def createView(c: Code): Pane = {
+	private def createView(c: CodeNodeModel): Pane = {
 		val control = createControlPane
 		val code = createCodePane
 		val prop = createPropertiesPane
 
-		window.setTitle(c.descriptor.name)
+		window.setTitle(c.getDescriptor.name)
 
 		this.controlsPane = Some(control)
 
@@ -293,7 +298,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 	private def compileAction(ed: TextArea, pi: ProgressIndicator): Unit = {
 		val compileString = ed.getText
 
-		code.code = compileString
+    code.setCodeString(compileString)
 
 		pi.setStyle(" -fx-accent: orange;");
 		new Thread(new CompileTask(pi)).start()
@@ -330,7 +335,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 						}
 
 						println("running update")
-						updateModel
+						//updateModel
 					}
 				})
 			}
@@ -526,7 +531,7 @@ class CodeUIController(private val code: Code, private val window: Window, priva
 		})*/
 
 		this.editor = new TextArea()
-		this.editor.setText(code.code)
+		this.editor.setText(code.getCodeString)
 		this.editor
 	}
 }

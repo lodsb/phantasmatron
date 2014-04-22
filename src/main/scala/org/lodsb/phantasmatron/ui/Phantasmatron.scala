@@ -30,6 +30,9 @@ import scalafx.util.Duration._
 import scalafx.util.converter.NumberStringConverter
 import scalafx.geometry.Insets
 
+import scalafx.Includes._
+import org.lodsb.phantasmatron.ui.dataflow.DataFlowVisualization
+import org.lodsb.phantasmatron.core.dataflow.DataflowModel
 
 object Phantasmatron extends JFXApp {
   stage = new JFXApp.PrimaryStage {
@@ -38,9 +41,9 @@ object Phantasmatron extends JFXApp {
     height = 800
 
 
-    val flow = new Flow
+    val flow = new DataFlowVisualization(new DataflowModel())
     val assetPane = new AssetPane
-	  val toolBar = new ToolBar(flow.flow)
+	  //val toolBar = new ToolBar(flow.flow)
 
     val splitPane = new SplitPane{
       items.add(assetPane)
@@ -50,7 +53,7 @@ object Phantasmatron extends JFXApp {
     val codeShell = new CodeShell
 
     val borderpane = new BorderPane {
-		  this.top = toolBar
+		  //this.top = toolBar
       this.center = splitPane
       this.bottom = new VBox {
         val v = new TitledPane{
@@ -62,9 +65,13 @@ object Phantasmatron extends JFXApp {
 
         children.add(v)
       }
+
     }
 
-  scene = new Scene(borderpane, 1000,1000)
+  scene = new Scene(borderpane, 1000,1000) {
+    stylesheets add (new File("default.css").toURI.toString)
+  }
+
 
 	splitPane.dividerPositions = 0.15
 

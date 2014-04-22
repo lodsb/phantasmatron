@@ -28,7 +28,7 @@ class CodeFlowSkin(skinFactory: FXSkinFactory, model: VNode, controller: VFlow)
     val code = getModel.getValueObject.getValue.asInstanceOf[Code]
 
     if( (!getModel.isInstanceOf[VFlowModel]) && (code != null)) {
-      new CodeUIController(code, getNode, getModel)
+      new CodeUIController(null, getNode, getModel)
     }
   }
 
