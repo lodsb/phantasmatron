@@ -10,6 +10,7 @@ import org.lodsb.phantasmatron.ui.dataflow.RemoveAllNodeConnections
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
 import org.lodsb.phantasmatron.core.asset.{AssetDescriptor, CodeAssetManager}
 import org.lodsb.phantasmatron.core.code.{CompileResult, CompileSuccess, CompileError}
+import jfxtras.labs.scene.layout.ScalableContentPane
 
 //import javafx.scene.layout.GridPane
 
@@ -26,7 +27,6 @@ import scalafx.Includes._
 import scala.Some
 import scalafx.event.Event
 import scalafx.scene.paint.Color
-import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 
 
 /**

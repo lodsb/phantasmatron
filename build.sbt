@@ -8,9 +8,9 @@ resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositori
 
 libraryDependencies += "org.lodsb" %% "reakt" % "0.2-SNAPSHOT"
 
-libraryDependencies += "eu.mihosoft.vrl.workflow-8.0" % "vworkflows-fx" % "0.1-r2-SNAPSHOT"
+//libraryDependencies += "eu.mihosoft.vrl.workflow-8.0" % "vworkflows-fx" % "0.1-r2-SNAPSHOT"
 
-libraryDependencies += "eu.mihosoft.vrl.workflow-8.0" % "vworkflows-core" % "0.1-r2-SNAPSHOT"
+//libraryDependencies += "eu.mihosoft.vrl.workflow-8.0" % "vworkflows-core" % "0.1-r2-SNAPSHOT"
 
 libraryDependencies += "org.jfxtras" % "jfxtras-labs" % "8.0-r1"
 

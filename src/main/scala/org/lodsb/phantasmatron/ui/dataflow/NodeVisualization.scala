@@ -2,7 +2,6 @@ package org.lodsb.phantasmatron.ui.dataflow
 
 import jfxtras.labs.scene.control.window.{MinimizeIcon, CloseIcon, Window}
 import org.lodsb.phantasmatron.core.dataflow.{ConnectorModel, NodeModel, CodeNodeModel}
-import eu.mihosoft.vrl.workflow.fx.NodeUtil
 
 
 import javafx.beans.binding.DoubleBinding
@@ -15,6 +14,7 @@ import javafx.collections.ObservableList
 import java.lang.reflect.Method
 import org.lodsb.phantasmatron.core.messaging.MessageBus
 import org.lodsb.phantasmatron.ui.code.CodeUIController
+import org.lodsb.phantasmatron.ui.NodeUtil
 
 //import scalafx.scene.input.MouseEvent
 import javafx.scene.input.MouseEvent
@@ -122,7 +122,8 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
         adjustConnectorSize
       }
     })
-    NodeUtil.addToParent(getParent, connectorNode)
+
+    jfxtras.util.NodeUtil.addToParent(getParent,connectorNode)
 
     //connectorNode.onMouseEnteredProperty set {x: MouseEvent => connectorNode.toFront()}
 
@@ -223,7 +224,7 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
       else if (connector.isOutput) {
         outputConnectors = outputConnectors diff List(connectorNode)
       }
-      NodeUtil.removeFromParent(connectorNode)
+      jfxtras.util.NodeUtil.removeFromParent(connectorNode)
     }
   }
 
