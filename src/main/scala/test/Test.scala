@@ -1,8 +1,6 @@
 package test
 
 import de.sciss.scalainterpreter.{Style, CodePane}
-import javax.swing.{JPanel, JComponent}
-import java.awt.{FlowLayout, Dimension}
 
 /**
  * Created by lodsb on 12/17/13.

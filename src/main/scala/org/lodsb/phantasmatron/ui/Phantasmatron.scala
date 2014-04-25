@@ -4,35 +4,16 @@ package org.lodsb.phantasmatron.ui
  * Created by lodsb on 12/22/13.
  */
 
-import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.scene.{Node, Scene}
-import scalafx.scene.paint.Color
-import scalafx.scene.shape.{MoveTo, LineTo, Path, Rectangle}
-import scalafx.stage.Stage
+import scalafx.scene.Scene
 import java.io.File
 import scalafx.scene.control._
-import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 import scalafx.application.JFXApp
-import scalafx.Includes._
-import scalafx.animation._
-import scalafx.animation.Animation.INDEFINITE
-import scalafx.stage.{Stage, WindowEvent}
-import scalafx.event.ActionEvent
-import scalafx.scene.chart._
-import scalafx.scene.control.TabPane.TabClosingPolicy._
 import scalafx.scene.layout._
-import scalafx.scene.image.{Image, ImageView}
-import scalafx.geometry.Pos._
-import scalafx.geometry.Orientation._
-import scalafx.geometry.Side._
-import scalafx.util.Duration._
-import scalafx.util.converter.NumberStringConverter
-import scalafx.geometry.Insets
 
-import scalafx.Includes._
-import org.lodsb.phantasmatron.ui.dataflow.{ConnectionVisualization, DataFlowVisualization}
+import org.lodsb.phantasmatron.ui.dataflow.DataFlowVisualization
 import org.lodsb.phantasmatron.core.dataflow.{CodeGraphManager, DataflowModel}
+import org.lodsb.phantasmatron.ui.asset.AssetPane
+import org.lodsb.phantasmatron.ui.code.CodeShell
 
 object Phantasmatron extends JFXApp {
   stage = new JFXApp.PrimaryStage {

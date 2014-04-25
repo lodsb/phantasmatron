@@ -1,6 +1,5 @@
-package org.lodsb.phantasmatron.core
+package org.lodsb.phantasmatron.core.asset
 
-import javafx.beans.value._
 import javafx.collections.ListChangeListener
 import java.nio.file.Path
 import javafx.collections.ListChangeListener.Change
@@ -9,6 +8,9 @@ import scala.pickling._
 import json._
 import scala.util.Try
 import java.io.File
+import org.lodsb.phantasmatron.core.io.FileWatcherTask
+import org.lodsb.phantasmatron.core.Config
+import org.lodsb.phantasmatron.core.code.Code
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.

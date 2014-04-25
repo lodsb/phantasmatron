@@ -1,15 +1,11 @@
 package org.lodsb.phantasmatron.ui.dataflow
 
 import jfxtras.labs.scene.control.window.{MinimizeIcon, CloseIcon, Window}
-import javafx.scene.control.Control
 import org.lodsb.phantasmatron.core.dataflow.{ConnectorModel, NodeModel, CodeNodeModel}
-import org.lodsb.phantasmatron.ui.CodeUIController
-import eu.mihosoft.vrl.workflow.fx.{FXNewConnectionSkin, NodeUtil, ConnectorCircle, FlowNodeWindow}
+import eu.mihosoft.vrl.workflow.fx.NodeUtil
 
 
-import javafx.scene.shape.Circle
 import javafx.beans.binding.DoubleBinding
-import javafx.scene.input.{TransferMode, DragEvent, MouseDragEvent, MouseEvent}
 import javafx.scene.{Parent, Node}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.geometry.Bounds
@@ -17,9 +13,8 @@ import javafx.event.EventHandler
 import scalafx.collections.ObservableBuffer
 import javafx.collections.ObservableList
 import java.lang.reflect.Method
-import javafx.scene.effect.BlendMode
-import scalafx.scene.input.ClipboardContent
 import org.lodsb.phantasmatron.core.messaging.MessageBus
+import org.lodsb.phantasmatron.ui.code.CodeUIController
 
 //import scalafx.scene.input.MouseEvent
 import javafx.scene.input.MouseEvent
@@ -279,11 +274,9 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
       inputConnectorsSize = Math.min(inputConnectorsSize, outputConnectorsSize)
       outputConnectorsSize = inputConnectorsSize
     }
-    import scala.collection.JavaConversions._
     for (connector <- inputConnectors) {
       connector.setRadius(inputConnectorsSize / 2.0)
     }
-    import scala.collection.JavaConversions._
     for (connector <- outputConnectors) {
       connector.setRadius(outputConnectorsSize / 2.0)
     }
@@ -311,5 +304,5 @@ class CodeNodeVisualization(model: CodeNodeModel) extends NodeVisualization(mode
   getLeftIcons.add(new CloseIcon(this))
   getLeftIcons.add(new MinimizeIcon(this))
 
-  new CodeUIController(model, this, null)
+  new CodeUIController(model, this)
 }

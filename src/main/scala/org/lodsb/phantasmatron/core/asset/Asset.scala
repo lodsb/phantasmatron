@@ -1,12 +1,18 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.core.asset
 
+import javafx.scene.input.DataFormat
+
+
+/**
+ * Created by lodsb on 4/25/14.
+ */
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
     >>  NO responsibility taken for ANY harm, damage done
     >>  to you, your data, animals, etc.
     >>
   +2>>
-    >>  Last modified:  2013-12-25 :: 20:01
+    >>  Last modified:  2013-12-25 :: 04:45
     >>  Origin: phantasmatron
     >>
   +3>>
@@ -21,18 +27,10 @@ package org.lodsb.phantasmatron.ui
   +4>>
     >>  Made in Bavaria by fat little elves - since 1983.
  */
-object CodeUIControllerManager {
-	private var controllers = List[CodeUIController]()
+trait Asset {}
 
-	def register(c: CodeUIController) = {
-		controllers = controllers :+ c
-	}
+case class AssetDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
 
-	def compileAll() = {
-		controllers.foreach{ c=>
-			c.uiCompile
-		}
-	}
+object CreateNewCodeNode extends AssetDescriptor("New CodeNode", None, List.empty, "", "code")
 
-
-}
+object AssetDataFormat extends DataFormat("AssetDescriptor")

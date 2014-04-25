@@ -1,6 +1,6 @@
 package org.lodsb.phantasmatron.ui.dataflow
 
-import javafx.scene.control.{Tooltip, Skin, Control}
+import javafx.scene.control.Tooltip
 import scalafx.Includes._
 import javafx.scene.{Parent, Group, Node}
 import scalafx.scene.shape.{LineTo, MoveTo, Circle, Path}
@@ -10,8 +10,6 @@ import scalafx.scene.paint.Color
 import org.lodsb.phantasmatron.core.dataflow.{CodeConnectorModel, ConnectionModel}
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
-import jfxtras.labs.scene.control.window.CloseIcon
-import org.controlsfx.glyphfont.FontAwesome
 import org.lodsb.phantasmatron.core.messaging.MessageBus
 import org.lodsb.phantasmatron.ui.Util
 

@@ -1,13 +1,10 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.ui.asset
 
-import scalafx.scene.layout.{HBox, Priority, VBox, GridPane}
+import scalafx.scene.layout.{HBox, Priority, VBox}
 import scalafx.Includes._
 import scalafx.scene.text.Text
 import scalafx.geometry.{Pos, Insets}
-import org.controlsfx.glyphfont.{FontAwesome, GlyphFontRegistry}
-import scalafx.scene.control.Label
-import scalafx.scene.paint.Color
-import scalafx.event.Event
+import org.controlsfx.glyphfont.FontAwesome
 import org.controlsfx.control.textfield.TextFields
 
 /*

@@ -1,18 +1,15 @@
-package org.lodsb.phantasmatron.core
+package org.lodsb.phantasmatron.core.code
 
-import org.lodsb.reakt.async.{VarA, ValA}
-import org.lodsb.reakt.sync.{VarS, ValS}
-import org.lodsb.reakt.{TVar, TSignal}
+import org.lodsb.reakt.async.VarA
+import org.lodsb.reakt.sync.VarS
+import scalafx.application.Platform
+import scalafx.beans.property.StringProperty
+
+import org.lodsb.reakt.TVar
 import scalafx.scene.layout.{GridPane, Pane}
 import scalafx.scene.text.Text
-import scala.reflect.runtime.universe._
-import javax.swing.event.{ChangeEvent, ChangeListener}
-import scalafx.beans.value.ObservableValue
-import javafx.beans.value
-import scalafx.beans.property.StringProperty
-import scalafx.application.Platform
-import org.lodsb.reakt.graph.NodeBase
 
+import scala.reflect.runtime.universe._
 
 /**
  * Created by lodsb on 12/20/13.
@@ -108,14 +105,6 @@ trait TaggedSignal[T, S <: TVar[T]] {
   def typeTag = innerTypeTag
 }
 
-/*
-class TaggedValA[T](val name: String, default: T)(implicit ev: TypeTag[TaggedValA[T]], ev2: TypeTag[T]) extends ValA(default) with TaggedSignal[T, TaggedValA[T]]{
-  var outerTypeTag = ev
-  var innerTypeTag = ev2
-
-}
-*/
-
 class TaggedVarA[T](val varName: String, default: T)(implicit ev: TypeTag[TaggedVarA[T]], ev2: TypeTag[T]) extends VarA(default) with TaggedSignal[T, TaggedVarA[T]]{
   var outerTypeTag = ev
   var innerTypeTag = ev2
@@ -123,13 +112,6 @@ class TaggedVarA[T](val varName: String, default: T)(implicit ev: TypeTag[Tagged
   override val async = true
   override val signalName = varName
 }
-
-/*
-class TaggedValS[T](val name: String, default: T)(implicit ev: TypeTag[TaggedValS[T]], ev2: TypeTag[T]) extends ValS(default) with TaggedSignal[T, TaggedValS[T]]{
-  var outerTypeTag = ev
-  var innerTypeTag = ev2
-}
-*/
 
 class TaggedVarS[T](val varName: String, default: T)(implicit ev: TypeTag[TaggedVarS[T]], ev2: TypeTag[T]) extends VarS(default) with TaggedSignal[T, TaggedVarS[T]]{
   var outerTypeTag = ev

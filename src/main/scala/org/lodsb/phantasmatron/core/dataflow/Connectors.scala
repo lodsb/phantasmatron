@@ -1,7 +1,7 @@
 package org.lodsb.phantasmatron.core.dataflow
 
-import org.lodsb.phantasmatron.core.TaggedSignal
 import org.lodsb.reakt.TVar
+import org.lodsb.phantasmatron.core.code.TaggedSignal
 
 /**
  * Created by lodsb on 4/20/14.

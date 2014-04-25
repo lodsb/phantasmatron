@@ -1,5 +1,5 @@
 {
-  "tpe": "org.lodsb.phantasmatron.core.AssetDescriptor",
+  "tpe": "org.lodsb.phantasmatron.core.asset.AssetDescriptor",
   "name": "faa",
   "author": "foo",
   "typeInfo": "code",

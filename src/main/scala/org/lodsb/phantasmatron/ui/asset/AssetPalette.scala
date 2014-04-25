@@ -1,17 +1,13 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.ui.asset
 
 import scalafx.scene.control.{TreeView, TreeItem}
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.input.{ClipboardContent, TransferMode, MouseEvent}
-import javafx.event.EventHandler
 import scalafx.Includes._
-import javafx.scene.input.DataFormat
-import scala.pickling._
-import json._
-import org.lodsb.phantasmatron.core.{CreateNewCodeNode, AssetDataFormat, AssetDescriptor, CodeAssetManager}
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import scalafx.application.Platform
+import org.lodsb.phantasmatron.core.asset.{CreateNewCodeNode, AssetDataFormat, AssetDescriptor, CodeAssetManager}
 
 /**
  * Created by lodsb on 12/22/13.

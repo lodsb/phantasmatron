@@ -1,16 +1,11 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.ui.code
 
 import scalafx.scene.layout.VBox
 import scalafx.scene.control.{TextField, TextArea}
 import scalafx.scene.input.{KeyCode, KeyEvent}
-import javafx.event.EventHandler
-import javafx.scene.input
 import scalafx.Includes._
-import org.lodsb.phantasmatron.core._
-import org.lodsb.phantasmatron.core.ScriptSuccess
-import org.lodsb.phantasmatron.core.ScriptError
-import java.io.{PrintStream, Writer}
 import javafx.application.Platform
+import org.lodsb.phantasmatron.core.code.{ScriptResult, ScriptEngine, ScriptSuccess, ScriptError}
 
 /**
  * Created by lodsb on 4/10/14.

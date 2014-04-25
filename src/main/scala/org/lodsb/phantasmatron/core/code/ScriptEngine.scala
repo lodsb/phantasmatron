@@ -1,4 +1,4 @@
-package org.lodsb.phantasmatron.core
+package org.lodsb.phantasmatron.core.code
 
 import java.io.Writer
 
@@ -26,7 +26,7 @@ object ScriptEngine {
 
 
   val intpCfg = Interpreter.Config()
-  intpCfg.imports :+= "org.lodsb.phantasmatron.core._"
+  intpCfg.imports :+= "org.lodsb.phantasmatron.core.code._"
 
   intpCfg.out = Some(writer)
 

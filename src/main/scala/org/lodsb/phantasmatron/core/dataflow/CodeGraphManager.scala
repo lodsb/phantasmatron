@@ -1,7 +1,6 @@
 package org.lodsb.phantasmatron.core.dataflow
 
 import scalafx.collections.ObservableBuffer
-import org.lodsb.phantasmatron.ui.dataflow.ConnectorVisualization
 import org.lodsb.reakt.TVar
 
 /**

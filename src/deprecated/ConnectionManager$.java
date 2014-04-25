@@ -1,7 +1,4 @@
-package org.lodsb.phantasmatron.core
-
-import eu.mihosoft.vrl.workflow.{VNode, Connector}
-import org.lodsb.reakt.{TVar, TSignal}
+package org.lodsb.phantasmatron.core;
 
 /**
  * Created by lodsb on 12/21/13.

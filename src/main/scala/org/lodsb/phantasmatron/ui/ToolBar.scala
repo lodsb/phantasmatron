@@ -2,12 +2,10 @@ package org.lodsb.phantasmatron.ui
 
 import scalafx.scene.control.{Separator, Button}
 import scalafx.scene.layout.{Priority, HBox, Region}
-import eu.mihosoft.vrl.workflow.VFlow
 import scalafx.event.Event
 import scalafx.Includes._
-import org.lodsb.phantasmatron.core.Code
 import org.lodsb.phantasmatron.core.dataflow.{CodeNodeModel, DataflowModel}
-import org.lodsb.phantasmatron.core.messaging.MessageBus
+import org.lodsb.phantasmatron.ui.code.CompileButton
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.

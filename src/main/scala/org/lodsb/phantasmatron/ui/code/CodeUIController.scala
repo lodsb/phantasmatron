@@ -1,29 +1,18 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.ui.code
 
 import jfxtras.labs.scene.control.window.Window
 import scalafx.scene.control._
 import scalafx.scene.layout._
-import scala.util.{Failure, Success}
 import org.controlsfx.dialog.Dialogs
-import javax.management.remote.rmi._RMIConnection_Stub
-import org.lodsb.reakt.TVar
-import org.lodsb.phantasmatron.core._
 import scala.util.Failure
-import scala.Some
-import org.lodsb.phantasmatron.core.ConnectorDescriptor
-import org.lodsb.phantasmatron.core.CompileSuccess
-import org.lodsb.phantasmatron.core.CompileError
-import org.lodsb.phantasmatron.core.AssetDescriptor
-import org.lodsb.phantasmatron.core.dataflow.{CompilationStarted, CompilationFinished, ConnectionModel, CodeNodeModel}
+import org.lodsb.phantasmatron.core.dataflow.{CompilationStarted, CompilationFinished, CodeNodeModel}
 import org.lodsb.phantasmatron.ui.dataflow.RemoveAllNodeConnections
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
+import org.lodsb.phantasmatron.core.asset.{AssetDescriptor, CodeAssetManager}
+import org.lodsb.phantasmatron.core.code.{CompileResult, CompileSuccess, CompileError}
 
 //import javafx.scene.layout.GridPane
 
-import eu.mihosoft.vrl.workflow._
-import de.sciss.scalainterpreter.CodePane
-import javax.swing.{JEditorPane, SwingUtilities, JPanel, JComponent}
-import java.awt.{Dimension, FlowLayout}
 import scalafx.geometry.{Pos, Insets}
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -34,9 +23,7 @@ import scalafx.concurrent.Task
 import scalafx.scene.Node
 import javafx.application.Platform
 import scalafx.Includes._
-import javax.swing.event.{ChangeEvent, ChangeListener}
 import scala.Some
-import org.lodsb.reakt.{TVar, TSignal}
 import scalafx.event.Event
 import scalafx.scene.paint.Color
 import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
@@ -46,7 +33,7 @@ import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
  * Created by lodsb on 12/20/13.
  */
 
-class CodeUIController(private val code: CodeNodeModel, private val window: Window, private val model: VNode) {
+class CodeUIController(private val code: CodeNodeModel, private val window: Window) {
 	outer =>
 
 	println("UI CONTROLLER")
@@ -67,11 +54,11 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
     maxWidth = 50
   }
 
-	CodeUIControllerManager.register(this)
+//	CodeUIControllerManager.register(this)
 	this.setWindowUI(code, window)
 
 
-	// crude workaround :-/
+/*	// crude workaround :-/
 	def uiCompile = {
 		if(model.getFlow.getNodes.toList.contains(model))  {
 			// if this node is still part of the flow
@@ -79,7 +66,7 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 		}
 	}
 
-
+  */
 
 	private def setWindowUI(code: CodeNodeModel, window: Window) = {
 
@@ -387,16 +374,6 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 
 		}
 	})
-
-	private def connect(src: Connector, dst: Connector) = {
-    println("CONNECT!")
-		ConnectionManager.connect(src, dst)
-	}
-
-	private def disconnect(src: Connector, dst: Connector) = {
-		ConnectionManager.disconnect(src, dst)
-	}
-
 
 	private def popUpAction(popOver: PopOver, pi: ProgressIndicator, ctx: ContextMenuEvent): Unit = {
 		if (compileResult.isDefined) {

@@ -8,7 +8,7 @@ import javafx.scene.control.Tooltip
 import scalafx.Includes._
 import javafx.scene.shape.Circle
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
-import scalafx.scene.effect.{Glow, Bloom}
+import scalafx.scene.effect.Bloom
 
 //import javafx.scene.shape.Circle
 

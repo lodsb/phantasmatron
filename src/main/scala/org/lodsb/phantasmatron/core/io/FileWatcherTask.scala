@@ -1,12 +1,8 @@
-package org.lodsb.phantasmatron.core
+package org.lodsb.phantasmatron.core.io
 
 import java.nio.file._
 import java.io.File
-import scalafx.concurrent.Task
-import javax.management.remote.rmi._RMIConnection_Stub
 import java.nio.file.attribute.BasicFileAttributes
-import javafx.collections.ObservableList
-import scala.collection.mutable
 import scalafx.collections.ObservableBuffer
 
 
@@ -34,7 +30,9 @@ import scalafx.collections.ObservableBuffer
 class FileWatcherTask(val directory: String) extends javafx.concurrent.Task[Unit]() {
 	val dir = new File(directory).toPath;
 
-	val fileList = ObservableBuffer[Path]()
+	val fileList = new ObservableBuffer[Path]()
+
+  //TODO: fixme - use message bus? !!
 
 	def rescan = {
 		fileList.clear()

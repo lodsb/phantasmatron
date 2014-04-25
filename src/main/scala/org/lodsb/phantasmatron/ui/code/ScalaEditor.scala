@@ -1,4 +1,4 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.ui.code
 
 /**
  * Created by lodsb on 4/18/14.
@@ -6,20 +6,18 @@ package org.lodsb.phantasmatron.ui
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.regex.Matcher;
+
 import java.util.regex.Pattern;
 
-import org.fxmisc.richtext.{StyleClassedTextArea, CodeArea, StyleSpansBuilder}
+import org.fxmisc.richtext.{CodeArea, StyleSpansBuilder}
 ;
 
 
-import javafx.application.Application;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage
-import java.io.File
+
+
 ;
 
 

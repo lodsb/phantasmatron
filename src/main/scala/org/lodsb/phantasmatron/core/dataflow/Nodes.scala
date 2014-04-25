@@ -1,10 +1,13 @@
 package org.lodsb.phantasmatron.core.dataflow
 
-import org.lodsb.phantasmatron.core._
-import org.lodsb.phantasmatron.core.AssetDescriptor
+
 import javafx.application.Platform
 import org.lodsb.reakt.TVar
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
+import org.lodsb.phantasmatron.core.code._
+import org.lodsb.phantasmatron.core.code.CompileError
+import org.lodsb.phantasmatron.core.asset.AssetDescriptor
+import scala.Some
 
 /**
  * Created by lodsb on 4/20/14.
@@ -27,8 +30,6 @@ case class CodeNodeModel(private val code: Code) extends NodeModel {
   }
 
   def compile : Unit = {
-    import scala.concurrent._
-    import ExecutionContext.Implicits.global
 
     new Thread( new Runnable{
       def run {
@@ -48,6 +49,11 @@ case class CodeNodeModel(private val code: Code) extends NodeModel {
             def run {
 
               connectors.clear()
+
+              if(codeObject.isDefined) {
+                codeObject.get.destroy()
+              }
+
               codeObject = Some(x.value)
 
               codeObject.get.inputs.foreach({ input =>

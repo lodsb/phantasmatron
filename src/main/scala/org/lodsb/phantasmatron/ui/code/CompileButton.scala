@@ -1,4 +1,4 @@
-package org.lodsb.phantasmatron.ui
+package org.lodsb.phantasmatron.ui.code
 
 import scalafx.scene.control.Button
 

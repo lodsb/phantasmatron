@@ -14,8 +14,10 @@ import scala.util.Success
 import scala.util.Failure
 import javafx.beans.property.ObjectProperty
 import scala.util.Success
-import org.lodsb.phantasmatron.core.AssetDescriptor
+import AssetDescriptor
 import scala.util.Failure
+import org.lodsb.phantasmatron.core.asset.CodeAssetManager
+import org.lodsb.phantasmatron.core.code.Code
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.

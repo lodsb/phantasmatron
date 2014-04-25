@@ -1,10 +1,6 @@
-package org.lodsb.phantasmatron.core
+package org.lodsb.phantasmatron.core.code
 
-import scala.util.Try
-import java.io.File
-import org.lodsb.phantasmatron.ui.CodeUIController
-import eu.mihosoft.vrl.workflow.ValueObject
-
+import org.lodsb.phantasmatron.core.asset.{Asset, AssetDescriptor}
 
 /**
  * Created by lodsb on 12/20/13.

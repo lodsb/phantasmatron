@@ -8,13 +8,15 @@ import javax.swing.{SwingUtilities, JPanel, JComponent}
 import java.awt.{Dimension, FlowLayout}
 import scalafx.scene.layout.{Pane, HBox, GridPane}
 import jfxtras.labs.scene.control.window.Window
-import org.lodsb.phantasmatron.core.{ConnectionManager, Code}
+import org.lodsb.phantasmatron.core.{ConnectionManager}
 import scalafx.Includes._
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import javafx.scene.shape.Shape
 import scalafx.scene.paint.Color
 import javafx.scene.control.Tooltip
+import org.lodsb.phantasmatron.core.code.Code
+import org.lodsb.phantasmatron.ui.code.CodeUIController
 
 /**
  * Created by lodsb on 12/20/13.

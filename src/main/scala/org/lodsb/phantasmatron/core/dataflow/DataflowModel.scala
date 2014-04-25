@@ -1,10 +1,7 @@
 package org.lodsb.phantasmatron.core.dataflow
 
 import scalafx.collections.ObservableBuffer
-import scalafx.beans.value.ObservableValue
-import scalafx.Includes._
 import scalafx.beans.property.StringProperty
-import scala.reflect.runtime.universe._
 
 /**
  * Created by lodsb on 4/20/14.

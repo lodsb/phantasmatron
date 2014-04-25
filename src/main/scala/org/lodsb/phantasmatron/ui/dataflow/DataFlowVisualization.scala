@@ -1,33 +1,27 @@
 package org.lodsb.phantasmatron.ui.dataflow
 
-import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 import java.io.File
 import org.lodsb.phantasmatron.core.dataflow._
 import javafx.event.EventHandler
 import javafx.scene.input._
 import javafx.scene.effect.BlendMode
-import org.lodsb.phantasmatron.core._
-import scala.util.{Failure, Success, Try}
-import org.lodsb.phantasmatron.core.AssetDescriptor
-import eu.mihosoft.vrl.workflow.VNode
+import scala.util.Try
+
 import org.controlsfx.dialog.Dialogs
 import javafx.scene.layout.Pane
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
-import scala.util.Success
-import org.lodsb.phantasmatron.core.AssetDescriptor
 
-import scala.util.Failure
-import org.lodsb.phantasmatron.core.dataflow.CodeNodeModel
 import scalafx.collections.ObservableBuffer
-import javafx.scene.transform.{Scale, Translate}
 import org.lodsb.phantasmatron.core.dataflow.ConnectionModel
-import org.lodsb.phantasmatron.core.AssetDescriptor
+
 import scala.util.Failure
 
 import scala.util.Success
 import org.lodsb.phantasmatron.core.dataflow.CodeNodeModel
 import javafx.scene.control.ScrollPane
 import javafx.scene.Group
+import org.lodsb.phantasmatron.core.asset.{AssetDataFormat, AssetDescriptor, CodeAssetManager}
+import org.lodsb.phantasmatron.core.code.Code
 
 /**
  * Created by lodsb on 2/18/14.
