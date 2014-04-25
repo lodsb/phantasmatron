@@ -9,6 +9,9 @@ import org.lodsb.reakt.TVar
 
 
 case class CodeConnectorModel[X](signal: TaggedSignal[X,_ <: TVar[X]], override val isInput: Boolean) extends ConnectorModel {
+
+  name() = signal.name
+
   def isCompatible(that: ConnectorModel): Boolean = {
     that match {
       case CodeConnectorModel(thatSignal,thatIsInput) => {

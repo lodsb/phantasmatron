@@ -6,15 +6,23 @@ import org.lodsb.phantasmatron.core.dataflow.{ConnectorModel, NodeModel, CodeNod
 import org.lodsb.phantasmatron.ui.CodeUIController
 import eu.mihosoft.vrl.workflow.fx.{FXNewConnectionSkin, NodeUtil, ConnectorCircle, FlowNodeWindow}
 
-import scalafx.Includes._
+
 import javafx.scene.shape.Circle
 import javafx.beans.binding.DoubleBinding
-import javafx.scene.input.MouseEvent
-import javafx.scene.Node
+import javafx.scene.input.{TransferMode, DragEvent, MouseDragEvent, MouseEvent}
+import javafx.scene.{Parent, Node}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.geometry.Bounds
 import javafx.event.EventHandler
 import scalafx.collections.ObservableBuffer
+import javafx.collections.ObservableList
+import java.lang.reflect.Method
+import javafx.scene.effect.BlendMode
+import scalafx.scene.input.ClipboardContent
+import org.lodsb.phantasmatron.core.messaging.MessageBus
+
+//import scalafx.scene.input.MouseEvent
+import javafx.scene.input.MouseEvent
 
 /**
  * Created by lodsb on 4/20/14.
@@ -31,7 +39,7 @@ object NodeVisualization{
   }
 }
 
-class NodeVisualization(model: NodeModel) extends Window {
+class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window {
   // use injection for ui stuff here?
 
   private var inputConnectors : List[ConnectorVisualization] = List.empty
@@ -56,6 +64,10 @@ class NodeVisualization(model: NodeModel) extends Window {
         case _ =>
       }
     })
+  }
+
+  def getConnectorVisualization(cm: ConnectorModel) : Option[ConnectorVisualization] = {
+    connectors.get(cm)
   }
 
   private def addConnector(connector: ConnectorModel) {
@@ -117,57 +129,88 @@ class NodeVisualization(model: NodeModel) extends Window {
 
     //connectorNode.onMouseEnteredProperty set {x: MouseEvent => connectorNode.toFront()}
 
+
     connectorNode.onMouseEnteredProperty.set(new EventHandler[MouseEvent] {
       def handle(t: MouseEvent) {
         connectorNode.toFront
+        t.consume()
       }
     })
 
-    /*
-    connectorNode.onMousePressedProperty.set(new EventHandler[MouseEvent] {
+    connectorNode.onMouseExitedProperty.set(new EventHandler[MouseEvent] {
       def handle(t: MouseEvent) {
-        if (controller.getConnections(connector.getType).isInputConnected(connector)) {
-          return
-        }
-        t.consume
-        newConnectionPressEvent = t
+        connectorNode.toBack
+        t.consume()
       }
     })
 
-    connectorNode.onMouseDraggedProperty.set(new EventHandler[MouseEvent] {
-      def handle(t: MouseEvent) {
-        if (controller.getConnections(connector.getType).isInputConnected(connector)) {
-          return
-        }
-        if (newConnectionSkin == null) {
-          newConnectionSkin = new FXNewConnectionSkin(getSkinFactory, getParent, connector, getController, connector.getType)
-          newConnectionSkin.add
-          MouseEvent.fireEvent(newConnectionSkin.getReceiverConnector, newConnectionPressEvent)
-        }
-        t.consume
-        MouseEvent.fireEvent(newConnectionSkin.getReceiverConnector, t)
-        t.consume
-        MouseEvent.fireEvent(newConnectionSkin.getReceiverConnector, t)
-      }
-    })
+
+
+     var currRec: ConnectorVisualization = null
+    var currConn : ConnectionVisualization = null
+        connectorNode.onMouseDraggedProperty.set(new EventHandler[MouseEvent] {
+          def handle(event: MouseEvent) {
+
+            if(currConn == null) {
+              currConn = new ConnectionVisualization()
+              getParentChildren.get.add(currConn)
+              currConn.startXProperty <== connectorNode.layoutXProperty()
+              currConn.startYProperty <== connectorNode.layoutYProperty()
+
+              MessageBus.send(ConnectingStartedMessage(connector))
+
+            }
+
+            val point = getParent.sceneToLocal(event.getSceneX, event.getSceneY)
+
+            currConn.endXProperty() = point.getX
+            currConn.endYProperty() = point.getY
+            currConn.toFront
+
+
+            val res = NodeUtil.getDeepestNode(getParent, event.getSceneX, event.getSceneY, classOf[ConnectorVisualization])
+
+            if(res != null) {
+              val c = res.asInstanceOf[ConnectorVisualization]
+
+              if(connectorNode.model.isCompatible(c.model)) {
+                currRec = c
+              } else {
+                currRec = null
+              }
+
+            } else {
+              currRec = null
+            }
+
+            if(currRec == null) {
+              currConn.setValid(false)
+            } else {
+              currConn.setValid(true)
+            }
+
+
+      }})
+
     connectorNode.onMouseReleasedProperty.set(new EventHandler[MouseEvent] {
       def handle(t: MouseEvent) {
-        connector.click(NodeUtil.mouseBtnFromEvent(t), t)
-        if (controller.getConnections(connector.getType).isInputConnected(connector)) {
-          return
-        }
-        t.consume
-        try {
-          MouseEvent.fireEvent(newConnectionSkin.getReceiverConnector, t)
-        }
-        catch {
-          case ex: Exception => {
+
+
+        MessageBus.send(ConnectingEndedMessage(connector))
+
+        if(currConn != null) {
+          getParentChildren.get.remove(currConn)
+
+          if(currRec != null) {
+            MessageBus.send(CreateConnectionMessage(connectorNode.model, currRec.model))
           }
+
+          currConn = null
+          currRec = null
         }
-        newConnectionSkin = null
-      }
-    })
-    */
+      }}
+    )
+
   }
 
   private def removeConnector(connector: ConnectorModel) {
@@ -242,6 +285,22 @@ class NodeVisualization(model: NodeModel) extends Window {
     for (connector <- outputConnectors) {
       connector.setRadius(outputConnectorsSize / 2.0)
     }
+  }
+
+
+  def getParentChildren : Option[ObservableList[Node]] = {
+    var ret : Option[ObservableList[Node]] = None
+    var protectedChildrenMethod: Method = null
+
+    try {
+      protectedChildrenMethod = classOf[Parent].getDeclaredMethod("getChildren")
+      protectedChildrenMethod.setAccessible(true)
+      ret = Some(protectedChildrenMethod.invoke(this.getParent.asInstanceOf[AnyRef]).asInstanceOf[ObservableList[Node]])
+    } catch {
+      case e:Throwable => System.err.println("Error getChildrenMethod")
+    }
+
+    ret
   }
 
 }

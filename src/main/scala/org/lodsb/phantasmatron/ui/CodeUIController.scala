@@ -14,7 +14,9 @@ import org.lodsb.phantasmatron.core.ConnectorDescriptor
 import org.lodsb.phantasmatron.core.CompileSuccess
 import org.lodsb.phantasmatron.core.CompileError
 import org.lodsb.phantasmatron.core.AssetDescriptor
-import org.lodsb.phantasmatron.core.dataflow.CodeNodeModel
+import org.lodsb.phantasmatron.core.dataflow.{ConnectionModel, CodeNodeModel}
+import org.lodsb.phantasmatron.ui.dataflow.RemoveAllNodeConnections
+import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
 
 //import javafx.scene.layout.GridPane
 
@@ -43,13 +45,25 @@ import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 /**
  * Created by lodsb on 12/20/13.
  */
+case class CompileCodeNodeMessage(codeNodeModel: CodeNodeModel) extends Message
 
 class CodeUIController(private val code: CodeNodeModel, private val window: Window, private val model: VNode) {
 	outer =>
 
 	println("UI CONTROLLER")
 
+  MessageBus.registerHandler({message: Message =>
 
+    message match {
+      case CompileCodeNodeMessage(cnode) => {
+        println("COMPILE?!")
+       if(cnode == code) {
+         compile()
+       }
+      }
+      case _ =>
+      }
+    })
 
 	// state monad?
 	private var compileResult: Option[CompileResult] = None
@@ -299,6 +313,9 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 		val compileString = ed.getText
 
     code.setCodeString(compileString)
+
+    // disconnect everything from the node
+    MessageBus.send(RemoveAllNodeConnections(code))
 
 		pi.setStyle(" -fx-accent: orange;");
 		new Thread(new CompileTask(pi)).start()

@@ -6,6 +6,8 @@ import eu.mihosoft.vrl.workflow.VFlow
 import scalafx.event.Event
 import scalafx.Includes._
 import org.lodsb.phantasmatron.core.Code
+import org.lodsb.phantasmatron.core.dataflow.{CodeNodeModel, DataflowModel}
+import org.lodsb.phantasmatron.core.messaging.MessageBus
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
@@ -28,7 +30,7 @@ import org.lodsb.phantasmatron.core.Code
   +4>>
     >>  Made in Bavaria by fat little elves - since 1983.
  */
-class ToolBar(flow: VFlow) extends scalafx.scene.control.ToolBar {
+class ToolBar(model: DataflowModel) extends scalafx.scene.control.ToolBar {
 	private val reg = new Region
 	HBox.setHgrow(reg, Priority.ALWAYS)
 
@@ -46,7 +48,13 @@ class ToolBar(flow: VFlow) extends scalafx.scene.control.ToolBar {
 
 	// crude workaround, have to think of something...
 	compileButton.onAction = (ev: Event) => {
-		CodeUIControllerManager.compileAll()
+
+    model.nodes.foreach({ n =>
+      n match {
+        case x:CodeNodeModel => MessageBus.send(CompileCodeNodeMessage(x))
+        case _ =>
+      }
+    })
 	}
 
 }

@@ -8,7 +8,7 @@ import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.scene.{Node, Scene}
 import scalafx.scene.paint.Color
-import scalafx.scene.shape.Rectangle
+import scalafx.scene.shape.{MoveTo, LineTo, Path, Rectangle}
 import scalafx.stage.Stage
 import java.io.File
 import scalafx.scene.control._
@@ -17,12 +17,12 @@ import scalafx.application.JFXApp
 import scalafx.Includes._
 import scalafx.animation._
 import scalafx.animation.Animation.INDEFINITE
-import scalafx.stage.{ Stage, WindowEvent }
+import scalafx.stage.{Stage, WindowEvent}
 import scalafx.event.ActionEvent
 import scalafx.scene.chart._
 import scalafx.scene.control.TabPane.TabClosingPolicy._
 import scalafx.scene.layout._
-import scalafx.scene.image.{ Image, ImageView }
+import scalafx.scene.image.{Image, ImageView}
 import scalafx.geometry.Pos._
 import scalafx.geometry.Orientation._
 import scalafx.geometry.Side._
@@ -31,8 +31,8 @@ import scalafx.util.converter.NumberStringConverter
 import scalafx.geometry.Insets
 
 import scalafx.Includes._
-import org.lodsb.phantasmatron.ui.dataflow.DataFlowVisualization
-import org.lodsb.phantasmatron.core.dataflow.DataflowModel
+import org.lodsb.phantasmatron.ui.dataflow.{ConnectionVisualization, DataFlowVisualization}
+import org.lodsb.phantasmatron.core.dataflow.{CodeGraphManager, DataflowModel}
 
 object Phantasmatron extends JFXApp {
   stage = new JFXApp.PrimaryStage {
@@ -41,11 +41,15 @@ object Phantasmatron extends JFXApp {
     height = 800
 
 
-    val flow = new DataFlowVisualization(new DataflowModel())
-    val assetPane = new AssetPane
-	  //val toolBar = new ToolBar(flow.flow)
+    val model = new DataflowModel()
 
-    val splitPane = new SplitPane{
+    val codeGraph = new CodeGraphManager(model)
+
+    val flow = new DataFlowVisualization(model)
+    val assetPane = new AssetPane
+    val toolBar = new ToolBar(model)
+
+    val splitPane = new SplitPane {
       items.add(assetPane)
       items.add(flow)
     }
@@ -53,12 +57,12 @@ object Phantasmatron extends JFXApp {
     val codeShell = new CodeShell
 
     val borderpane = new BorderPane {
-		  //this.top = toolBar
+      this.top = toolBar
       this.center = splitPane
       this.bottom = new VBox {
-        val v = new TitledPane{
+        val v = new TitledPane {
           text = "Shell"
-          content  = codeShell
+          content = codeShell
 
           expanded = false
         }
@@ -68,12 +72,11 @@ object Phantasmatron extends JFXApp {
 
     }
 
-  scene = new Scene(borderpane, 1000,1000) {
-    stylesheets add (new File("default.css").toURI.toString)
-  }
+    scene = new Scene(borderpane, 1000, 1000) {
+      stylesheets add (new File("default.css").toURI.toString)
+    }
 
-
-	splitPane.dividerPositions = 0.15
+    splitPane.dividerPositions = 0.15
 
   }
 }

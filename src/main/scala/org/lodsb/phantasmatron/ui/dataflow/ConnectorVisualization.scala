@@ -1,18 +1,47 @@
 package org.lodsb.phantasmatron.ui.dataflow
 
-import scalafx.scene.shape.Circle
 import org.lodsb.phantasmatron.core.dataflow.{CodeConnectorModel, ConnectorModel}
 import org.lodsb.phantasmatron.ui.Util
 import scalafx.scene.paint.Color
 import javafx.scene.control.Tooltip
 
 import scalafx.Includes._
+import javafx.scene.shape.Circle
+import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
+import scalafx.scene.effect.{Glow, Bloom}
+
+//import javafx.scene.shape.Circle
 
 /**
  * Created by lodsb on 4/21/14.
  */
-class ConnectorVisualization(protected val model: ConnectorModel) extends Circle {
+
+case class ConnectingStartedMessage(model: ConnectorModel) extends Message
+case class ConnectingEndedMessage(model: ConnectorModel) extends Message
+
+class ConnectorVisualization(protected[dataflow] val model: ConnectorModel) extends Circle {
   this.radius = 20
+  private val effect = new Bloom
+  effect.threshold = 0.1
+
+
+
+  //TODO: add unregister
+  MessageBus.registerHandler({x: Message =>
+    x match {
+      case ConnectingStartedMessage(m2)=> {
+           if(model.isCompatible(m2)){
+             this.setEffect(effect)
+           }
+      }
+
+      case ConnectingEndedMessage(m2) => {
+        this.setEffect(null)
+      }
+
+      case _ =>
+    }
+  })
 
 }
 
@@ -27,15 +56,19 @@ class CodeConnectorVisualization[X](model: CodeConnectorModel[X]) extends Connec
   this.fill = typeColor
 
   if(model.signal.isAsync) {
-    stroke = Color.WHITE
-    strokeWidth = 2
-    strokeDashArray.addAll(3d)
+    this.setStroke(Color.WHITE)
+    this.setStrokeWidth(2)
+
+    this.getStrokeDashArray.add(3)
     signalInfo = ", async"
   }
 
 
   val t = new Tooltip(signalName + model.signal.typeString+signalInfo)
   Tooltip.install(this, t)
+
+
+
 }
 
 object ConnectorVisualization {

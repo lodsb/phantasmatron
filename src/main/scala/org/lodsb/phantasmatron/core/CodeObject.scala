@@ -28,6 +28,9 @@ trait CodeObject {
   var propertyPanel: Pane = new GridPane{
     add(new Text("No properties"), 0,0)
   }
+
+  //TODO: integrate
+  def destroy() = {}
 }
 
 /**

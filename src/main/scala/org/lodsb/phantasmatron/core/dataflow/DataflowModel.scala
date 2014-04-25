@@ -32,6 +32,17 @@ trait NodeModel extends IdEntity {
 class DataflowModel extends IdEntity {
   val nodes = new ObservableBuffer[NodeModel]()
   val connections = new ObservableBuffer[ConnectionModel]()
+
+  //TODO: this is all slow, should be fixed lateron
+  def disconnectAllConnectionsFromNode(node: NodeModel) = {
+    node.connectors.foreach({x=>
+      val toRemove = connections.filter({ p => p.source == x || p.destination == x})
+
+      toRemove.foreach{ r =>
+        connections.remove(r)
+      }
+    })
+  }
 }
 
 object IdGenerator {
