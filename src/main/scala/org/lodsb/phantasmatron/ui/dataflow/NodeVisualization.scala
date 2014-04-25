@@ -64,6 +64,8 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
         case _ =>
       }
     })
+
+    this.requestLayout()
   }
 
   def getConnectorVisualization(cm: ConnectorModel) : Option[ConnectorVisualization] = {

@@ -51,7 +51,7 @@ class ToolBar(model: DataflowModel) extends scalafx.scene.control.ToolBar {
 
     model.nodes.foreach({ n =>
       n match {
-        case x:CodeNodeModel => MessageBus.send(CompileCodeNodeMessage(x))
+        case x:CodeNodeModel => x.compile
         case _ =>
       }
     })

@@ -14,7 +14,7 @@ import org.lodsb.phantasmatron.core.ConnectorDescriptor
 import org.lodsb.phantasmatron.core.CompileSuccess
 import org.lodsb.phantasmatron.core.CompileError
 import org.lodsb.phantasmatron.core.AssetDescriptor
-import org.lodsb.phantasmatron.core.dataflow.{ConnectionModel, CodeNodeModel}
+import org.lodsb.phantasmatron.core.dataflow.{CompilationStarted, CompilationFinished, ConnectionModel, CodeNodeModel}
 import org.lodsb.phantasmatron.ui.dataflow.RemoveAllNodeConnections
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
 
@@ -45,25 +45,11 @@ import eu.mihosoft.vrl.workflow.fx.ScalableContentPane
 /**
  * Created by lodsb on 12/20/13.
  */
-case class CompileCodeNodeMessage(codeNodeModel: CodeNodeModel) extends Message
 
 class CodeUIController(private val code: CodeNodeModel, private val window: Window, private val model: VNode) {
 	outer =>
 
 	println("UI CONTROLLER")
-
-  MessageBus.registerHandler({message: Message =>
-
-    message match {
-      case CompileCodeNodeMessage(cnode) => {
-        println("COMPILE?!")
-       if(cnode == code) {
-         compile()
-       }
-      }
-      case _ =>
-      }
-    })
 
 	// state monad?
 	private var compileResult: Option[CompileResult] = None
@@ -72,6 +58,14 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 	private var controlsPane: Option[TitledPane] = None
 
 	private var compile = {() => println("NOT DEFINED?!?!?!?")}
+
+  var progressIndicator: ProgressBar =new ProgressBar() {
+    style = " -fx-accent: green;"
+    /*minHeight = 40
+      minWidth = 40 */
+    maxHeight = 25
+    maxWidth = 50
+  }
 
 	CodeUIControllerManager.register(this)
 	this.setWindowUI(code, window)
@@ -314,12 +308,20 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 
     code.setCodeString(compileString)
 
+    code.compile
+
     // disconnect everything from the node
+	}
+
+  private def startCompileUIFeedback(pi: ProgressIndicator) = {
     MessageBus.send(RemoveAllNodeConnections(code))
 
-		pi.setStyle(" -fx-accent: orange;");
-		new Thread(new CompileTask(pi)).start()
-	}
+    pi.setStyle(" -fx-accent: orange;");
+    new Thread(new CompileTask(pi)).start()
+  }
+
+  private var compilationFinished = true
+  private val compMutex = new Object
 
 	private class CompileTask(pi: ProgressIndicator) extends Task(new javafx.concurrent.Task[Unit]() {
 
@@ -332,8 +334,7 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 				updateProgress(-1, 10)
 
 
-				outer.compileResult = Some(code.compile)
-				updateProgress(10, 10)
+				//outer.compileResult = Some(code.compile)
 
 				/*
 				outer.compileResult.get match {
@@ -341,18 +342,40 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 				  case _ => pi.setStyle(" -fx-progress-color: red;");
 				} */
 
+        var done = false
+        while(!done) {
+          Thread.sleep(100)
+          compMutex.synchronized {
+            done = compilationFinished
+          }
+        }
 
-				println("before update")
+        updateProgress(10, 10)
+
 				Platform.runLater(new Runnable {
 					def run {
 
 						compileResult.get match {
-							case x: CompileSuccess => pi.setStyle(" -fx-accent: green;");
-							case _ => pi.setStyle(" -fx-accent: red;");
+							case x: CompileSuccess => {
+                pi.setStyle(" -fx-accent: green;")
+
+                if(code.getCodeObject.isDefined) {
+                  val codeNodeControls = code.getCodeObject.get.controlPanel
+
+                  if (controlsPane.isDefined) {
+                    val nodeControlsPane = controlsPane.get
+
+                    nodeControlsPane.setContent(codeNodeControls)
+                  }
+                }
+              };
+
+              case _ => {
+                pi.setStyle(" -fx-accent: red;")
+              };
 						}
 
-						println("running update")
-						//updateModel
+            window.requestLayout()
 					}
 				})
 			}
@@ -374,95 +397,6 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 		ConnectionManager.disconnect(src, dst)
 	}
 
-	private def updateModel = {
-
-		println("UPDATE MODEL")
-
-		try {
-
-			if (compileResult.isDefined) {
-				compileResult.get match {
-					case x: CompileError => println("Error: " + x.message)
-					case x: CompileSuccess => {
-
-						val codeNode = x.value
-						val vnode = this.model.asInstanceOf[PNode]
-
-						vnode.getConnectors.clear()
-						ConnectionManager.diconnectAll(vnode)
-
-						codeNode.inputs.foreach {
-							x =>
-
-								val conn = new PConnector(vnode, x.typeTag, null, true);
-                val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
-                ConnectionManager.addConnectorDescr(cdesc)
-
-                vnode.addInputConnector(conn);
-
-							/*conn.addClickEventListener(new EventHandler[ClickEvent] {
-							  def handle(p1: ClickEvent): Unit = {
-								if(p1.getButton == MouseButton.SECONDARY) {
-								  println("foo")
-								}
-							  }
-							})*/
-						}
-
-						codeNode.outputs.foreach {
-							x =>
-                val conn = new PConnector(vnode, x.typeTag, null, false);
-								val cdesc = ConnectorDescriptor(vnode, conn, x.asInstanceOf[TaggedSignal[AnyRef, TVar[AnyRef]]])
-                ConnectionManager.addConnectorDescr(cdesc)
-
-                vnode.addOutputConnector(conn)
-
-							/*conn.addClickEventListener(new EventHandler[ClickEvent] {
-							  def handle(p1: ClickEvent): Unit = {
-								if(p1.getButton == MouseButton.SECONDARY) {
-								  val t = new Tooltip
-								  t.setText(("Type: "+x.typeString))
-								  t.autoHide = true
-								}
-							  }
-							})*/
-						}
-
-
-						val connIterator = vnode.getConnectors.iterator()
-            println(vnode.getConnectors)
-
-						while (connIterator.hasNext) {
-							val connector = connIterator.next()
-							connector.addConnectionEventListener(new EventHandler[ConnectionEvent] {
-								def handle(p1: ConnectionEvent): Unit = {
-                  println(p1+ " - conn event "+p1.getEventType + " " + ConnectionEvent.ADD + ConnectionEvent.REMOVE );
-									p1.getEventType match {
-										case ConnectionEvent.ADD => connect(p1.getSenderConnector, p1.getReceiverConnector)
-										case ConnectionEvent.REMOVE => disconnect(p1.getSenderConnector, p1.getReceiverConnector)
-									}
-								}
-							})
-
-
-						}
-
-						val codeNodeControls = codeNode.controlPanel
-
-						if (this.controlsPane.isDefined) {
-							val nodeControlsPane = this.controlsPane.get
-
-							nodeControlsPane.setContent(codeNodeControls)
-						}
-
-					}
-				}
-			}
-		} catch {
-			case e: Throwable => e.printStackTrace
-		}
-
-	}
 
 	private def popUpAction(popOver: PopOver, pi: ProgressIndicator, ctx: ContextMenuEvent): Unit = {
 		if (compileResult.isDefined) {
@@ -477,7 +411,7 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 		}
 	}
 
-	//TODO: progress indicator should move into the window's title (so it can be seen when minimized)
+  //TODO: progress indicator should move into the window's title (so it can be seen when minimized)
 	private def createCodePaneControls: HBox = {
 		val reg = new Region()
 		val reg2 = new Region()
@@ -485,13 +419,13 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 		HBox.setHgrow(reg, Priority.ALWAYS)
 		HBox.setHgrow(reg2, Priority.NEVER)
 
-		val progressIndicator = new ProgressBar() {
+		/* progressIndicator = new ProgressBar() {
 			style = " -fx-accent: green;"
 			/*minHeight = 40
 			  minWidth = 40 */
 			maxHeight = 25
 			maxWidth = 50
-		}
+		} */
 
 		progressIndicator.setProgress(1)
 
@@ -551,4 +485,43 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 		this.editor.setText(code.getCodeString)
 		this.editor
 	}
+
+
+
+
+
+
+
+
+  MessageBus.registerHandler({message: Message =>
+
+    message match {
+      case CompilationStarted(cnode) => {
+        println("COMPILE?!")
+        if(cnode == code) {
+          compMutex.synchronized {
+          compilationFinished = false
+
+          startCompileUIFeedback(progressIndicator)
+          }
+        }
+
+      }
+
+      case CompilationFinished(cnode, compResult) => {
+        if(cnode == code) {
+            compMutex.synchronized{
+              compileResult = Some(compResult)
+              compilationFinished = true
+          }
+        }
+      }
+
+      case _ =>
+    }
+  })
+
+
+
+
 }
