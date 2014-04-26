@@ -1,6 +1,6 @@
 package org.lodsb.phantasmatron.ui.code
 
-import jfxtras.labs.scene.control.window.Window
+
 import scalafx.scene.control._
 import scalafx.scene.layout._
 import org.controlsfx.dialog.Dialogs
@@ -11,6 +11,10 @@ import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
 import org.lodsb.phantasmatron.core.asset.{AssetDescriptor, CodeAssetManager}
 import org.lodsb.phantasmatron.core.code.{CompileResult, CompileSuccess, CompileError}
 import jfxtras.labs.scene.layout.ScalableContentPane
+import jfxtras.labs.scene.control.window.Window
+import jfxtras.labs.internal.scene.control.skin.window.DefaultWindowSkin
+import javafx.geometry.Bounds
+import javafx.beans.value.{ChangeListener, ObservableValue}
 
 //import javafx.scene.layout.GridPane
 
@@ -75,13 +79,61 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 
 		val view = createView(code)
 
+    //scalablePane.prefWidth <== window.widthProperty()
+    //scalablePane.prefHeight <== window.heightProperty()
+
 		flowPane.children.add(view)
 
-		scalablePane.setContentPane(flowPane)
+	 scalablePane.setContentPane(flowPane)
 
+
+    flowPane.setMaxSize(500,500)
+
+    flowPane.autosize()
 		window.setContentPane(scalablePane)
 
-		println("ok?")
+    //window.setMinSize(300,300)
+
+    //window.setResizableWindow(false)
+
+    //window.resize(400,400)
+
+    window.boundsInParent.addListener(new ChangeListener[Bounds] {
+      def changed(ov: ObservableValue[_ <: Bounds], t: Bounds, t1: Bounds) {
+        val h = ov.getValue.getHeight
+        val w = ov.getValue.getWidth
+
+        println(w+ " "+h)
+
+        editor.prefColumnCount = 10+(w/10).toInt
+        editor.prefRowCount = 5+(h/40).toInt
+      }
+    })
+
+    window.requestLayout()
+    scalablePane.setPrefSize(350,350)
+
+    scalablePane.setAspectScale(true)
+    scalablePane.setAutoRescale(true)
+    window.setPrefSize(400,400)
+
+    //window.setLayoutX(window.getLayoutX)
+    //window.setLayoutY(window.getLayoutY)
+
+    //scalablePane.resize(400,400)
+    scalablePane.requestLayout()
+
+    println(window.getPrefHeight + " " + window.getPrefWidth)
+    println(scalablePane.getPrefHeight + " " + scalablePane.getPrefWidth)
+    println(flowPane.getPrefHeight + " " + flowPane.getPrefWidth)
+
+    flowPane.layout()
+    scalablePane.layout()
+
+    window.layout()
+
+    scalablePane.requestScale()
+
 	}
 
 	val width = 400
@@ -100,11 +152,13 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 				add(csp, 0, 1)
 			}
 
-			grid.getRowConstraints.add(new RowConstraints(50))
+			//grid.getRowConstraints.add(new RowConstraints(50))
 
 			content = grid
 
 		}
+
+    VBox.setVgrow(codePane, Priority.ALWAYS)
 
 		//ccp.minWidth <== codePane.width
 
@@ -460,9 +514,9 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 
 		this.editor = new TextArea()
 		this.editor.setText(code.getCodeString)
+
 		this.editor
 	}
-
 
 
 

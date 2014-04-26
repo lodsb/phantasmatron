@@ -22,6 +22,8 @@ import javafx.scene.control.ScrollPane
 import javafx.scene.Group
 import org.lodsb.phantasmatron.core.asset.{AssetDataFormat, AssetDescriptor, CodeAssetManager}
 import org.lodsb.phantasmatron.core.code.Code
+import jfxtras.labs.internal.scene.control.skin.window.DefaultWindowSkin
+import org.lodsb.phantasmatron.ui.NodeUtil
 
 /**
  * Created by lodsb on 2/18/14.
@@ -56,6 +58,14 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
 
       case RemoveAllNodeConnections(nodeModel) => {
         model.disconnectAllConnectionsFromNode(nodeModel)
+      }
+
+      case ConnectingStartedMessage(f) => {
+        setPannable(false)
+      }
+
+      case ConnectingEndedMessage(f) => {
+        setPannable(true)
       }
 
       case _ =>
@@ -109,6 +119,31 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
       }
     })
   }
+
+
+  private var curMouseX = 0.0
+  private var curMouseY = 0.0
+  this.setOnMouseMoved(new EventHandler[MouseEvent]{
+    def handle(p1: MouseEvent): Unit = {
+      curMouseX = p1.getSceneX
+      curMouseY = p1.getSceneY
+    }
+
+  })
+
+  this.setOnKeyPressed(new EventHandler[KeyEvent] {
+    def handle(p1: KeyEvent): Unit = {
+      p1.getCode match {
+        case KeyCode.ENTER => {
+          println(curMouseX+" "+curMouseY)
+
+
+          show popup
+        }
+        case _ =>
+      }
+    }
+  })
 
 
   this.setOnDragEntered(new EventHandler[DragEvent] {
@@ -193,7 +228,22 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
     model.nodes.add(nm)
 
     val viz = NodeVisualization(nm)
-    contentGroup.getChildren.add(viz)
+    contentPane.getChildren.add(viz)
+
+    viz.prefHeightProperty().set(480)
+
+    viz.requestLayout()
+
+    //viz.setPrefWidth(400)
+    //contentGroup.requestLayout()
+
+    this.requestLayout()
+
+   // viz.setScaleX(0.75)
+   // viz.setScaleY(0.75)
+
+
+
 
     nodes = nodes :+ viz
 
@@ -206,7 +256,7 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
     val viz = EstablishedConnectionVisualization(cmodel, source, destination)
     connections = connections + (cmodel -> viz)
 
-    contentGroup.getChildren.add(viz)
+    contentPane.getChildren.add(viz)
     viz.toBack()
 
     viz
@@ -218,7 +268,7 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
     if(c.isDefined) {
       val viz = c.get
 
-      contentGroup.getChildren.remove(viz)
+      contentPane.getChildren.remove(viz)
       connections = connections - cmodel
     }
   }
@@ -245,6 +295,7 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
   })*/
 
 
+
   this.addEventFilter(ScrollEvent.ANY, new EventHandler[ScrollEvent] {
     private var deltaScroll = 1.0
 
@@ -255,8 +306,20 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
          deltaScroll = scala.math.max(deltaScroll - 0.1, 0.1)
        }
 
-        contentGroup.setScaleX(deltaScroll)
-        contentGroup.setScaleY(deltaScroll)
+
+        val res = NodeUtil.getDeepestNode(getParent, p1.getSceneX, p1.getSceneY, classOf[NodeVisualization])
+
+      if(res != null) {
+        println("node")
+        val nodeGroup = res.asInstanceOf[NodeVisualization]
+        nodeGroup.setScaleX(deltaScroll)
+        nodeGroup.setScaleY(deltaScroll)
+      } else {
+
+        println("group "+p1.isConsumed + " "+ res)
+        //contentGroup.setScaleX(deltaScroll)
+        //contentGroup.setScaleY(deltaScroll)
+      }
 
       p1.consume()
     }

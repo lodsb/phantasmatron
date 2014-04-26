@@ -1,11 +1,11 @@
 package org.lodsb.phantasmatron.ui.dataflow
 
-import jfxtras.labs.scene.control.window.{MinimizeIcon, CloseIcon, Window}
+import jfxtras.labs.scene.control.window.{Window, MinimizeIcon, CloseIcon}
 import org.lodsb.phantasmatron.core.dataflow.{ConnectorModel, NodeModel, CodeNodeModel}
 
 
 import javafx.beans.binding.DoubleBinding
-import javafx.scene.{Parent, Node}
+import javafx.scene.{Group, Parent, Node}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.geometry.Bounds
 import javafx.event.EventHandler
@@ -14,7 +14,8 @@ import javafx.collections.ObservableList
 import java.lang.reflect.Method
 import org.lodsb.phantasmatron.core.messaging.MessageBus
 import org.lodsb.phantasmatron.ui.code.CodeUIController
-import org.lodsb.phantasmatron.ui.NodeUtil
+import org.lodsb.phantasmatron.ui.{NodeUtil}
+import javafx.scene.layout.Pane
 
 //import scalafx.scene.input.MouseEvent
 import javafx.scene.input.MouseEvent
@@ -58,20 +59,30 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
 
         case _ =>
       }
+
+      computeInputConnectorSize
+      computeOutputConnectorSize
+      adjustConnectorSize
+
     })
 
     this.requestLayout()
   }
 
+
+
+
+
   def getConnectorVisualization(cm: ConnectorModel) : Option[ConnectorVisualization] = {
     connectors.get(cm)
   }
 
-  private def addConnector(connector: ConnectorModel) {
+   private def addConnector(connector: ConnectorModel) {
     //connectorList.add(connector)
 
 
     val connectorNode = ConnectorVisualization(connector)
+
     connectors = connectors + (connector -> connectorNode)
 
     if (connector.isInput) {
@@ -95,6 +106,7 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
 
       super.bind(layoutYProperty(), heightProperty())
 
+
       protected def computeValue: Double = {
         val connectorHeight: Double = connectorNode.getRadius * 2
         val gap: Double = 5
@@ -115,6 +127,10 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
     connectorNode.layoutYProperty.bind(startYBinding)
 
 
+    startXBinding.get
+    startYBinding.get()
+
+
     boundsInLocalProperty.addListener(new ChangeListener[Bounds] {
       def changed(observable: ObservableValue[_ <: Bounds], oldValue: Bounds, newValue: Bounds) {
         computeInputConnectorSize
@@ -123,7 +139,9 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
       }
     })
 
-    jfxtras.util.NodeUtil.addToParent(getParent,connectorNode)
+    //jfxtras.util.NodeUtil.addToParent(getParent,connectorNode)
+    getParent.asInstanceOf[Pane].getChildren.add(connectorNode)
+
 
     //connectorNode.onMouseEnteredProperty set {x: MouseEvent => connectorNode.toFront()}
 
@@ -208,6 +226,9 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
         }
       }}
     )
+
+    this.setHeight(this.getHeight)
+    this.setWidth(this.getWidth)
 
   }
 
@@ -298,6 +319,11 @@ class NodeVisualization(protected[dataflow] val model: NodeModel) extends Window
 
     ret
   }
+
+
+  computeInputConnectorSize
+  computeOutputConnectorSize
+  adjustConnectorSize
 
 }
 

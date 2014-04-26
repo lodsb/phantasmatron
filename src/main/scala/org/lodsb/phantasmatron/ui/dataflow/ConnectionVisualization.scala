@@ -3,7 +3,7 @@ package org.lodsb.phantasmatron.ui.dataflow
 import javafx.scene.control.Tooltip
 import scalafx.Includes._
 import javafx.scene.{Parent, Group, Node}
-import scalafx.scene.shape.{LineTo, MoveTo, Circle, Path}
+import scalafx.scene.shape._
 
 import scalafx.beans.property.DoubleProperty
 import scalafx.scene.paint.Color
@@ -12,6 +12,8 @@ import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 import org.lodsb.phantasmatron.core.messaging.MessageBus
 import org.lodsb.phantasmatron.ui.Util
+import org.lodsb.phantasmatron.core.dataflow.ConnectionModel
+import org.lodsb.phantasmatron.core.dataflow.CodeConnectorModel
 
 //import javafx.beans.property.DoubleProperty
 
@@ -19,19 +21,21 @@ import org.lodsb.phantasmatron.ui.Util
 /**
  * Created by lodsb on 4/23/14.
  */
-class ConnectionVisualization(protected var skin: ConnectionVisualizationSkin = null, showCloseButton : Boolean = false ) extends Parent {
+class ConnectionVisualization(showCloseButton : Boolean = false ) extends Parent {
   val startXProperty = DoubleProperty(0)
   val startYProperty = DoubleProperty(0)
 
   val endXProperty = DoubleProperty(0)
   val endYProperty = DoubleProperty(0)
 
-  if(skin == null) {
-    skin = new LineConnectionVisualizationSkin(this, showCloseButton , 5)
-  }
-
-
+  protected var skin: ConnectionVisualizationSkin = new LineConnectionVisualizationSkin(this, showCloseButton , 5)
   this.getChildren.add(skin.getNode)
+
+  def setSkin(s: ConnectionVisualizationSkin) {
+    this.getChildren.remove(skin.getNode)
+    this.getChildren.add(s.getNode)
+    this.skin = s
+  }
 
   def setValid(v : Boolean) = {
     if(v) {
@@ -47,8 +51,9 @@ class ConnectionVisualization(protected var skin: ConnectionVisualizationSkin = 
 class EstablishedConnectionVisualization( protected[dataflow] val model: ConnectionModel,
                                           source: ConnectorVisualization,
                                          destination: ConnectorVisualization,
-                                         s: ConnectionVisualizationSkin = null) extends ConnectionVisualization(s, true) {
+                                         s: ConnectionVisualizationSkin = null) extends ConnectionVisualization(true) {
 
+  this.setSkin(new QuadConnectionVisualizationSkin(this, true))
 
   this.startXProperty <== source.layoutXProperty()
   this.startYProperty <== source.layoutYProperty()
@@ -69,6 +74,7 @@ class EstablishedConnectionVisualization( protected[dataflow] val model: Connect
   var rmConn = false
   this.onMouseExitedProperty.set(new EventHandler[MouseEvent] {
     def handle(t: MouseEvent) {
+
       toBack
       t.consume()
 
@@ -138,22 +144,10 @@ abstract class ConnectionVisualizationSkin(protected val control: ConnectionVisu
 
 class QuadConnectionVisualizationSkin(control: ConnectionVisualization, showCloseButton: Boolean = false, lRadius: Double = 1) extends ConnectionVisualizationSkin(control) {
   val moveto = MoveTo(0,0)
-  val lineto = LineTo(0,0)
+  val quadto = QuadCurveTo(0,0,0,0)
+  val quadt2 = QuadCurveTo(0,0,0,0)
 
-  moveto.x <== control.startXProperty
-  moveto.y <== control.startYProperty
-
-  lineto.x <== control.endXProperty
-  lineto.y <== control.endYProperty
-
-  val p = new Path {
-    elements = List(
-      moveto,
-      lineto
-    )
-  }
-
-  p.setStrokeWidth(2.5)
+  private val offset = 20
 
   val s = new Circle {
     radius = lRadius
@@ -163,13 +157,49 @@ class QuadConnectionVisualizationSkin(control: ConnectionVisualization, showClos
     radius = lRadius
   }
 
-
-
   s.centerX <== control.startXProperty
   s.centerY <== control.startYProperty
 
   e.centerX <== control.endXProperty
   e.centerY <== control.endYProperty
+
+  moveto.x <== control.startXProperty
+  moveto.y <== control.startYProperty
+
+  val yy = ((control.endYProperty-control.startYProperty))
+  val xx = ((control.endXProperty-control.startXProperty))
+
+  val distSqr = max((xx*xx)+(yy*yy),1)
+
+  val centerX = s.centerX + ( (e.centerX-s.centerX) * 0.5)
+  val centerY = s.centerY + ( (e.centerY-s.centerY) * 0.5)
+
+  //val interm = min(distSqr/10000, 100)
+
+
+
+  quadto.controlX <== control.startXProperty  + (( (control.endXProperty-control.startXProperty)/distSqr) * 10000)
+  quadto.controlY <== control.startYProperty// + offset
+
+  quadto.x <== centerX
+  quadto.y <== centerY
+
+  quadt2.controlX <== control.endXProperty   + (( (control.startXProperty-control.endXProperty)/distSqr) * 10000)
+  quadt2.controlY <== control.endYProperty// - offset
+
+  quadt2.x <== control.endXProperty
+  quadt2.y <== control.endYProperty
+
+  val p = new Path {
+    elements = List(
+      moveto,
+      quadto,
+      quadt2
+    )
+  }
+
+  p.setStrokeWidth(3)
+
 
   /*
   val g = FontAwesome.Glyph.REMOVE_CIRCLE.create()
@@ -190,8 +220,8 @@ class QuadConnectionVisualizationSkin(control: ConnectionVisualization, showClos
       }
     })
 
-    m.layoutXProperty() <== s.centerX + ( (e.centerX-s.centerX) * 0.5)
-    m.layoutYProperty() <== s.centerY + ( (e.centerY-s.centerY) * 0.5)
+    m.layoutXProperty() <== centerX
+    m.layoutYProperty() <== centerY
     m.fill = Color.RED
     m.stroke = Color.WHITE
 
@@ -212,7 +242,7 @@ class QuadConnectionVisualizationSkin(control: ConnectionVisualization, showClos
 
 
   def setDashed(enable: Boolean) = {
-    p.getStrokeDashArray.add(3)
+    p.getStrokeDashArray.add(4)
   }
 
 }

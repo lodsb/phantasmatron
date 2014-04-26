@@ -27,7 +27,10 @@ object Phantasmatron extends JFXApp {
     val codeGraph = new CodeGraphManager(model)
 
     val flow = new DataFlowVisualization(model)
+
     val assetPane = new AssetPane
+    assetPane.setMaxWidth(200)
+
     val toolBar = new ToolBar(model)
 
     val splitPane = new SplitPane {
