@@ -1,3 +1,25 @@
+/*
+ * +1>>  This source code is licensed as GPLv3 if not stated otherwise.
+ *     >>  NO responsibility taken for ANY harm, damage done
+ *     >>  to you, your data, animals, etc.
+ *     >>
+ *   +2>>
+ *     >>  Last modified:  4/27/14 10:09 AM
+ *     >>  Origin: phantasmatron :: ToolBar.scala
+ *     >>
+ *   +3>>
+ *     >>  Copyright (c) 2014:
+ *     >>
+ *     >>     |             |     |
+ *     >>     |    ,---.,---|,---.|---.
+ *     >>     |    |   ||   |`---.|   |
+ *     >>     `---'`---'`---'`---'`---'
+ *     >>                    // Niklas Klügel
+ *     >>
+ *   +4>>
+ *     >>  Made in Bavaria by fat little elves - since 1983.
+ */
+
 package org.lodsb.phantasmatron.ui
 
 import scalafx.scene.control.{Separator, Button}
@@ -7,27 +29,6 @@ import scalafx.Includes._
 import org.lodsb.phantasmatron.core.dataflow.{CodeNodeModel, DataflowModel}
 import org.lodsb.phantasmatron.ui.code.CompileButton
 
-/*
-  +1>>  This source code is licensed as GPLv3 if not stated otherwise.
-    >>  NO responsibility taken for ANY harm, damage done
-    >>  to you, your data, animals, etc.
-    >>
-  +2>>
-    >>  Last modified:  2013-12-25 :: 17:16
-    >>  Origin: phantasmatron
-    >>
-  +3>>
-    >>  Copyright (c) 2013:
-    >>
-    >>     |             |     |
-    >>     |    ,---.,---|,---.|---.
-    >>     |    |   ||   |`---.|   |
-    >>     `---'`---'`---'`---'`---'
-    >>                    // Niklas Klügel
-    >>
-  +4>>
-    >>  Made in Bavaria by fat little elves - since 1983.
- */
 class ToolBar(model: DataflowModel) extends scalafx.scene.control.ToolBar {
 	private val reg = new Region
 	HBox.setHgrow(reg, Priority.ALWAYS)
