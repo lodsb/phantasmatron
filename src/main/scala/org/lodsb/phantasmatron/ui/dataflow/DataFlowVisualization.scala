@@ -20,7 +20,7 @@ import scala.util.Success
 import org.lodsb.phantasmatron.core.dataflow.CodeNodeModel
 import javafx.scene.control.ScrollPane
 import javafx.scene.Group
-import org.lodsb.phantasmatron.core.asset.{AssetDataFormat, AssetDescriptor, CodeAssetManager}
+import org.lodsb.phantasmatron.core.asset.{AssetDataFormat, CodeAssetDescriptor, CodeAssetManager}
 import org.lodsb.phantasmatron.core.code.Code
 import jfxtras.labs.internal.scene.control.skin.window.DefaultWindowSkin
 import org.lodsb.phantasmatron.ui.NodeUtil
@@ -38,9 +38,6 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
   this.getStylesheets.setAll((new File("default.css").toURI.toString))
 
   val contentPane = new Pane
-  val contentGroup = new Group
-  contentPane.getChildren.add(contentGroup)
-
   this.setContent(contentPane)
 
   this.setPannable(true)
@@ -131,12 +128,30 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
 
   })
 
+  private var currentAssetBox: Option[AssetBox] = None
   this.setOnKeyPressed(new EventHandler[KeyEvent] {
     def handle(p1: KeyEvent): Unit = {
+      println(p1)
       p1.getCode match {
         case KeyCode.ENTER => {
           println(curMouseX+" "+curMouseY)
 
+          if(currentAssetBox.isEmpty || (currentAssetBox.isDefined && !contentPane.getChildren.contains(currentAssetBox.get))) {
+
+            if(currentAssetBox.isDefined) {
+              println(currentAssetBox.get.isVisible)
+            }
+
+            val box = new AssetBox(DataFlowVisualization.this)
+
+            contentPane.getChildren.add(box)
+            box.setLayoutX(curMouseX)
+            box.setLayoutY(curMouseY)
+
+            box.inputBox.requestFocus()
+
+            currentAssetBox = Some(box)
+          }
 
         }
         case _ =>
@@ -177,44 +192,11 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
       System.out.println("DRAG Drop" + dragEvent.getDragboard.getContentTypes)
       val db: Dragboard = dragEvent.getDragboard
       if (db.getContentTypes.contains(AssetDataFormat)) {
-        val o: AssetDescriptor = db.getContent(AssetDataFormat).asInstanceOf[AssetDescriptor]
-        System.out.println("correct drop format")
-        val c: Try[Code] = CodeAssetManager.load(o)
+        val asset: CodeAssetDescriptor = db.getContent(AssetDataFormat).asInstanceOf[CodeAssetDescriptor]
 
-        c match {
-          case Success(cc) => {
+        loadAsset(asset, dragEvent.getX, dragEvent.getY)
 
-            val codeModel = CodeNodeModel(cc)
-            val viz = addNode(codeModel)
-
-            viz.setLayoutX(dragEvent.getX)
-            viz.setLayoutY(dragEvent.getY)
-            //viz.setX(dragEvent.getX)
-            //viz.setY(dragEvent.getY)
-            //viz.setWidth(300)
-            //viz.setHeight(200)
-
-
-            /*val pv = new PValueObject()
-            pv.setValue(cc)
-            val v: VNode = flow.newNode(pv)
-
-            v.setX(dragEvent.getX)
-            v.setY(dragEvent.getY)
-            v.setWidth(300)
-            v.setHeight(200)
-
-            //val skin: VNodeSkin[_ <: VNode] = skinFactory.createSkin(v, flow)
-            //skin.add*/
-
-            dragEvent.setDropCompleted(true)
-          }
-          case Failure(v) => {
-            Dialogs.create().title("Error")
-              .masthead("Sorry - there was an exception while creating the CodeNode")
-              .showException(v)
-          }
-        }
+        dragEvent.setDropCompleted(true)
       }
       setBlendMode(BlendMode.MULTIPLY)
     }
@@ -230,19 +212,8 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
     contentPane.getChildren.add(viz)
 
     viz.prefHeightProperty().set(480)
-
     viz.requestLayout()
-
-    //viz.setPrefWidth(400)
-    //contentGroup.requestLayout()
-
     this.requestLayout()
-
-   // viz.setScaleX(0.75)
-   // viz.setScaleY(0.75)
-
-
-
 
     nodes = nodes :+ viz
 
@@ -272,39 +243,17 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
     }
   }
 
-  /*
-  this.setOnMouseDragged(new EventHandler[MouseEvent]{
-    private var lastDragX = 0.0
-    private var lastDragY = 0.0
-
-    def handle(p1: MouseEvent): Unit = {
-      val x = p1.getX
-      val y = p1.getY
-
-      if(lastDragX != 0.0 && lastDragY != 0.0) {
-        val deltaX = lastDragX - x
-        val deltaY = lastDragY - y
-
-        getContent.getTransforms.add(new Translate(deltaX, deltaY))
-      }
-
-      lastDragX = x
-      lastDragY = y
-    }
-  })*/
-
-
-
   this.addEventFilter(ScrollEvent.ANY, new EventHandler[ScrollEvent] {
     private var deltaScroll = 1.0
 
     def handle(p1: ScrollEvent): Unit = {
        if(p1.getDeltaY > 0) {
-         deltaScroll = scala.math.max(deltaScroll + 0.05, 10)
+         deltaScroll = scala.math.min(deltaScroll + 0.15, 10)
        } else {
-         deltaScroll = scala.math.max(deltaScroll - 0.05, 0.1)
+         deltaScroll = scala.math.max(deltaScroll - 0.15, 0.1)
        }
 
+      println(deltaScroll + " " +p1.getDeltaY)
 
         val res = NodeUtil.getDeepestNode(getParent, p1.getSceneX, p1.getSceneY, classOf[NodeVisualization])
 
@@ -317,13 +266,52 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
 
         println("group "+p1.isConsumed + " "+ res)
 
-        getContent.setScaleX(deltaScroll)
-        getContent.setScaleY(deltaScroll)
+        contentPane.setScaleX(deltaScroll)
+        contentPane.setScaleY(deltaScroll)
       }
 
       p1.consume()
     }
   })
+
+  def loadAsset(a: CodeAssetDescriptor, x: Double, y: Double) = {
+    System.out.println("correct drop format")
+    val c: Try[Code] = CodeAssetManager.load(a)
+
+    c match {
+      case Success(cc) => {
+
+        val codeModel = CodeNodeModel(cc)
+        val viz = addNode(codeModel)
+
+        viz.setLayoutX(x)
+        viz.setLayoutY(y)
+        //viz.setX(dragEvent.getX)
+        //viz.setY(dragEvent.getY)
+        //viz.setWidth(300)
+        //viz.setHeight(200)
+
+
+        /*val pv = new PValueObject()
+        pv.setValue(cc)
+        val v: VNode = flow.newNode(pv)
+
+        v.setX(dragEvent.getX)
+        v.setY(dragEvent.getY)
+        v.setWidth(300)
+        v.setHeight(200)
+
+        //val skin: VNodeSkin[_ <: VNode] = skinFactory.createSkin(v, flow)
+        //skin.add*/
+
+      }
+      case Failure(v) => {
+        Dialogs.create().title("Error")
+          .masthead("Sorry - there was an exception while creating the CodeNode")
+          .showException(v)
+      }
+    }
+  }
 
 }
 

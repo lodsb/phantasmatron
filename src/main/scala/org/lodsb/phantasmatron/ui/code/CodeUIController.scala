@@ -8,7 +8,7 @@ import scala.util.Failure
 import org.lodsb.phantasmatron.core.dataflow.{CompilationStarted, CompilationFinished, CodeNodeModel}
 import org.lodsb.phantasmatron.ui.dataflow.RemoveAllNodeConnections
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
-import org.lodsb.phantasmatron.core.asset.{AssetDescriptor, CodeAssetManager}
+import org.lodsb.phantasmatron.core.asset.{CodeAssetDescriptor, CodeAssetManager}
 import org.lodsb.phantasmatron.core.code.{CompileResult, CompileSuccess, CompileError}
 import jfxtras.labs.scene.layout.ScalableContentPane
 import jfxtras.labs.scene.control.window.Window
@@ -131,6 +131,7 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
     scalablePane.layout()
 
     window.layout()
+    window.setTitle(code.getDescriptor.name)
 
     scalablePane.requestScale()
 
@@ -286,7 +287,7 @@ class CodeUIController(private val code: CodeNodeModel, private val window: Wind
 				val tagList: List[String] = tags.getText.split(";").toList.map {
 					x => x.trim
 				}
-				val currentDesc = AssetDescriptor(nodeNameField.getText,
+				val currentDesc = CodeAssetDescriptor(nodeNameField.getText,
 					Some(src.getText),
 					tagList,
 					author.getText)

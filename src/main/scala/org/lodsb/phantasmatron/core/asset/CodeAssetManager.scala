@@ -36,7 +36,7 @@ import org.lodsb.phantasmatron.core.code.Code
 object CodeAssetManager {
 	private val fileWatcher = new FileWatcherTask(Config().codeLibrary)
 
-	val knownObjects = ObservableBuffer[AssetDescriptor]()
+	val knownObjects = ObservableBuffer[CodeAssetDescriptor]()
 
 	// TODO:  currently rather primitive
 	fileWatcher.fileList.addListener(new ListChangeListener[Path] {
@@ -58,7 +58,7 @@ object CodeAssetManager {
 			if(fileExtension.isDefined && fileExtension.get.equals("json")) {
 				val jsonString = scala.io.Source.fromFile(x.toFile).mkString
 
-				val desc = jsonString.unpickle[AssetDescriptor]
+				val desc = jsonString.unpickle[CodeAssetDescriptor]
 
 				knownObjects.add(desc)
 			}
@@ -66,7 +66,7 @@ object CodeAssetManager {
 		})
 	}
 
-	def load(desc: AssetDescriptor, path: String = Config().codeLibrary) : Try[Code] = {
+	def load(desc: CodeAssetDescriptor, path: String = Config().codeLibrary) : Try[Code] = {
 		  def createCode = {
 				val location = path+desc.location.get
 				val codeString = scala.io.Source.fromFile(location).mkString

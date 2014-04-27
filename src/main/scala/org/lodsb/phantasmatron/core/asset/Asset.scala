@@ -29,8 +29,8 @@ import javafx.scene.input.DataFormat
  */
 trait Asset {}
 
-case class AssetDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
+case class CodeAssetDescriptor(name: String, location: Option[String], tags: List[String], author: String = "lodsb", typeInfo: String ="code")
 
-object CreateNewCodeNode extends AssetDescriptor("New CodeNode", None, List.empty, "", "code")
+object CreateNewCodeNode extends CodeAssetDescriptor("New CodeNode", None, List.empty, "", "code")
 
 object AssetDataFormat extends DataFormat("AssetDescriptor")

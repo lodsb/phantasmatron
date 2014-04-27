@@ -1,11 +1,11 @@
 package org.lodsb.phantasmatron.core.code
 
-import org.lodsb.phantasmatron.core.asset.{Asset, AssetDescriptor}
+import org.lodsb.phantasmatron.core.asset.{Asset, CodeAssetDescriptor}
 
 /**
  * Created by lodsb on 12/20/13.
  */
-class Code(var code: String, var descriptor: AssetDescriptor) extends Asset {
+class Code(var code: String, var descriptor: CodeAssetDescriptor) extends Asset {
 
     /*"new TT { \n" +
     "inputs = List(Input[Float](\"first\", 0.32f))\n" +

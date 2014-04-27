@@ -6,7 +6,7 @@ import org.lodsb.reakt.TVar
 import org.lodsb.phantasmatron.core.messaging.{Message, MessageBus}
 import org.lodsb.phantasmatron.core.code._
 import org.lodsb.phantasmatron.core.code.CompileError
-import org.lodsb.phantasmatron.core.asset.AssetDescriptor
+import org.lodsb.phantasmatron.core.asset.CodeAssetDescriptor
 import scala.Some
 
 /**
@@ -16,18 +16,7 @@ import scala.Some
 case class CompilationStarted(codeNodeModel: CodeNodeModel) extends Message
 case class CompilationFinished(codeNodeModel: CodeNodeModel, compileResult: CompileResult) extends Message
 
-case class CodeNodeModel(private val code: Code) extends NodeModel {
-
-  def setCodeString(codeString: String) = {code.code = codeString}
-  def getCodeString : String = code.code
-  def getDescriptor = code.descriptor
-  def setDescriptor(desc:AssetDescriptor ) = {code.descriptor = desc}
-  def getCode = code
-
-  private var codeObject : Option[CodeObject] = None
-  def getCodeObject : Option[CodeObject] = {
-    codeObject
-  }
+case class CodeNodeModel(override var code: Code) extends NodeModel with Compileable {
 
   def compile : Unit = {
 
@@ -81,3 +70,6 @@ case class CodeNodeModel(private val code: Code) extends NodeModel {
 
 
 }
+
+
+
