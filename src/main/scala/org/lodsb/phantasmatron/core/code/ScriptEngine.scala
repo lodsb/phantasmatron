@@ -26,7 +26,8 @@ object ScriptEngine {
 
 
   val intpCfg = Interpreter.Config()
-  intpCfg.imports :+= "org.lodsb.phantasmatron.core.code._"
+  val imports: List[String] =org.lodsb.phantasmatron.core.Config().imports
+  intpCfg.imports = intpCfg.imports ++ imports
 
   intpCfg.out = Some(writer)
 

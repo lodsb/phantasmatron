@@ -125,8 +125,8 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
   private var curMouseY = 0.0
   this.setOnMouseMoved(new EventHandler[MouseEvent]{
     def handle(p1: MouseEvent): Unit = {
-      curMouseX = p1.getSceneX
-      curMouseY = p1.getSceneY
+      curMouseX = p1.getX
+      curMouseY = p1.getY
     }
 
   })
@@ -138,7 +138,6 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
           println(curMouseX+" "+curMouseY)
 
 
-          show popup
         }
         case _ =>
       }
@@ -301,9 +300,9 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
 
     def handle(p1: ScrollEvent): Unit = {
        if(p1.getDeltaY > 0) {
-         deltaScroll = deltaScroll + 0.1
+         deltaScroll = scala.math.max(deltaScroll + 0.05, 10)
        } else {
-         deltaScroll = scala.math.max(deltaScroll - 0.1, 0.1)
+         deltaScroll = scala.math.max(deltaScroll - 0.05, 0.1)
        }
 
 
@@ -312,13 +311,14 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
       if(res != null) {
         println("node")
         val nodeGroup = res.asInstanceOf[NodeVisualization]
-        nodeGroup.setScaleX(deltaScroll)
-        nodeGroup.setScaleY(deltaScroll)
+        //nodeGroup.setScaleX(deltaScroll)
+        //nodeGroup.setScaleY(deltaScroll)
       } else {
 
         println("group "+p1.isConsumed + " "+ res)
-        //contentGroup.setScaleX(deltaScroll)
-        //contentGroup.setScaleY(deltaScroll)
+
+        getContent.setScaleX(deltaScroll)
+        getContent.setScaleY(deltaScroll)
       }
 
       p1.consume()
