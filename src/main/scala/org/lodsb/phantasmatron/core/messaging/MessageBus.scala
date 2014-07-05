@@ -43,6 +43,7 @@ object MessageBus {
     }
   }
 
+  //TODO: move messaging entirely to ui thread? platform run later? get thread context?
   def send(msg: Message) = {
     handlerListMutex.synchronized {
 

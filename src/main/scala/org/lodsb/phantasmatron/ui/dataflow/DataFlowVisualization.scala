@@ -42,7 +42,7 @@ import scala.util.Success
 import org.lodsb.phantasmatron.core.dataflow.CodeNodeModel
 import javafx.scene.control.ScrollPane
 import javafx.scene.Group
-import org.lodsb.phantasmatron.core.asset.{AssetDataFormat, CodeAssetDescriptor, CodeAssetManager}
+import org.lodsb.phantasmatron.core.asset.{AssetDescriptor, AssetDataFormat, CodeAssetDescriptor, CodeAssetManager}
 import org.lodsb.phantasmatron.core.code.Code
 import jfxtras.labs.internal.scene.control.skin.window.DefaultWindowSkin
 import org.lodsb.phantasmatron.ui.NodeUtil
@@ -296,7 +296,7 @@ class DataFlowVisualization(model: DataflowModel) extends ScrollPane {
     }
   })
 
-  def loadAsset(a: CodeAssetDescriptor, x: Double, y: Double) = {
+  def loadAsset(a: AssetDescriptor[Code], x: Double, y: Double) = {
     System.out.println("correct drop format")
     val c: Try[Code] = CodeAssetManager.load(a)
 

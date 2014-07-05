@@ -29,7 +29,9 @@ import scalafx.Includes._
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import scalafx.application.Platform
-import org.lodsb.phantasmatron.core.asset.{CreateNewCodeNode, AssetDataFormat, CodeAssetDescriptor, CodeAssetManager}
+import org.lodsb.phantasmatron.core.asset._
+import org.lodsb.phantasmatron.core.code.Code
+import org.lodsb.phantasmatron.core.asset.CodeAssetDescriptor
 
 /**
  * Created by lodsb on 12/22/13.
@@ -38,11 +40,11 @@ import org.lodsb.phantasmatron.core.asset.{CreateNewCodeNode, AssetDataFormat, C
 
 class AssetPalette extends TreeView[String] {
 
-	var knownObjectsMap = Map[String, CodeAssetDescriptor]()
+	var knownObjectsMap = Map[String, AssetDescriptor[Code]]()
 
 	// TODO:  currently rather primitive
-	CodeAssetManager.knownObjects.addListener(new ListChangeListener[CodeAssetDescriptor] {
-		def onChanged(p1: Change[_ <: CodeAssetDescriptor]): Unit = {
+	CodeAssetManager.knownObjects.addListener(new ListChangeListener[AssetDescriptor[Code]] {
+		def onChanged(p1: Change[_ <: AssetDescriptor[Code]]): Unit = {
 			val objList = CodeAssetManager.knownObjects.toList
 
 			Platform.runLater({
@@ -67,6 +69,9 @@ class AssetPalette extends TreeView[String] {
 				println("DRAG " + selection)
 
 				val content = new ClipboardContent
+
+        println(desc.get)
+
 				content.put(AssetDataFormat, desc.get)
 
 				db.setContent(content)
@@ -90,7 +95,7 @@ class AssetPalette extends TreeView[String] {
 	}
 
 
-	private def buildTree(objectList: List[CodeAssetDescriptor]): TreeItem[String] = {
+	private def buildTree(objectList: List[AssetDescriptor[Code]]): TreeItem[String] = {
 		val categories = objectList.map(x => x.tags).flatten.distinct
 
 		// entry to create new node

@@ -3,6 +3,7 @@
   "name": "foo",
   "author": "foo",
   "typeInfo": "code",
+    "factory": "CodeAssetManager",
   "location": {
     "tpe": "scala.Some[java.lang.String]",
     "x": "foo"

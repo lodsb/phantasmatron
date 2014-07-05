@@ -30,6 +30,8 @@ import org.lodsb.phantasmatron.core.code._
 import org.lodsb.phantasmatron.core.code.CompileError
 import org.lodsb.phantasmatron.core.asset.CodeAssetDescriptor
 import scala.Some
+import org.lodsb.phantasmatron.core.code.macros
+import org.lodsb.phantasmatron.core.code.macros.MacroType
 
 /**
  * Created by lodsb on 4/20/14.
@@ -91,7 +93,7 @@ case class CodeNodeModel(override var code: Code) extends NodeModel with Compile
   }
 }
 
-case class CodeMacroNodeModel(override var code: Code) extends NodeModel with Compileable {
+case class CodeMacroNodeModel(override var code: Code, macroType: MacroType) extends NodeModel with Compileable {
 
   def compile : Unit = {
 

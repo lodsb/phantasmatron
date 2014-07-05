@@ -28,16 +28,17 @@ import javafx.collections.ListChangeListener.Change
 import scalafx.collections.ObservableBuffer
 import scala.pickling._
 import json._
-import scala.util.Try
+import scala.util.{Failure, Try}
 import java.io.File
 import org.lodsb.phantasmatron.core.io.FileWatcherTask
 import org.lodsb.phantasmatron.core.Config
 import org.lodsb.phantasmatron.core.code.Code
 
-object CodeAssetManager {
+object CodeAssetManager extends AssetManager[Code]("CodeAssetManager") {
+
 	private val fileWatcher = new FileWatcherTask(Config().codeLibrary)
 
-	val knownObjects = ObservableBuffer[CodeAssetDescriptor]()
+	//val knownObjects = ObservableBuffer[CodeAssetDescriptor]()
 
 	// TODO:  currently rather primitive
 	fileWatcher.fileList.addListener(new ListChangeListener[Path] {
@@ -67,7 +68,16 @@ object CodeAssetManager {
 		})
 	}
 
-	def load(desc: CodeAssetDescriptor, path: String = Config().codeLibrary) : Try[Code] = {
+  def instantiate(assetDescriptor: AssetDescriptor[Code]) : Try[Code] = {
+    assetDescriptor match {
+      case x:CodeAssetDescriptor => {
+        load(x)
+      }
+      case _ =>  Failure(new Exception("Unsupported Asset"))
+    }
+  }
+
+	def load(desc: AssetDescriptor[Code], path: String = Config().codeLibrary) : Try[Code] = {
 		  def createCode = {
 				val location = path+desc.location.get
 				val codeString = scala.io.Source.fromFile(location).mkString

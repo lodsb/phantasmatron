@@ -26,9 +26,9 @@ libraryDependencies += "com.googlecode.scalascriptengine" % "scalascriptengine" 
 
 //libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.10.3" // where i.e. ${scala.version} = 2.10.3
 
-libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.8.0-SNAPSHOT"
+libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.8.0"
 
-libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "1.0.0-SNAPSHOT"
+libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.3"
 
 unmanagedJars in Compile += Attributed.blank(file(System.getenv("JAVA_HOME")+"jre/lib/ext/jfxrt.jar"))
 
